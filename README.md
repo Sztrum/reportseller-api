@@ -55,6 +55,7 @@
 3. Create 2 databases, first for main application, second for telescope.
 4. Run `php artisan migrate` command.
 5. Run `npm install` command.
+6. test
 
 ### Configure auto artisan commands after git pull
 
