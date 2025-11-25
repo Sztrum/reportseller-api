@@ -21,13 +21,26 @@
    WORKSPACE_INSTALL_SOAP=true
    PHP_FPM_INSTALL_SOAP=true
    PHP_WORKER_INSTALL_SOAP=true
-   WORKSPACE_NODE_VERSION=18
+   WORKSPACE_NODE_VERSION=24
    ```
+   
+   Additionally, update all container user IDs to avoid clashes with the base image:
+   ```
+   WORKSPACE_PUID=1001
+   WORKSPACE_PGID=1001 
+   PHP_FPM_PUID=1002
+   PHP_FPM_PGID=1002 
+   PHP_WORKER_PUID=1003
+   PHP_WORKER_PGID=1003 
+   LARAVEL_HORIZON_PUID=1004
+   LARAVEL_HORIZON_PGID=1004
+   ```
+
 5. For Windows, set `DOCKER_SYNC_STRATEGY=unison` in `.env`. On macOS, leave `native_osx`.
 6. Set the project-specific settings:
    ```
-   COMPOSE_PROJECT_NAME=app-api
-   DATA_PATH_HOST=~/.laradock/app-api
+   COMPOSE_PROJECT_NAME=reportseller-api
+   DATA_PATH_HOST=~/.laradock/reportseller-api
    ```
 7. Run: 
    ```bash
