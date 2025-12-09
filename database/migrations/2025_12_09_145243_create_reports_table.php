@@ -7,15 +7,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends AbstractCreateTableMigration
 {
-    protected string $table_name = 'company_user';
+    protected string $table_name = 'reports';
 
     public function up(): void
     {
         Schema::create($this->table_name, static function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('company_id')->constrained('companies')->cascadeOnDelete();
-            $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('status', ['inactive', 'active'])->default('inactive');
+            $table->uuid()->primary();
+            $table->foreignUuid('listing_id')->constrained('listings');
             $table->timestamps();
         });
     }
