@@ -13,7 +13,7 @@ return new class extends AbstractCreateTableMigration
     public function up(): void
     {
         Schema::create($this->table_name, static function (Blueprint $table) {
-            $table->uuid()->primary();
+            $table->uuid('id')->primary();
             $table->foreignUuid('listing_id')->constrained('listings')->restrictOnDelete();
             $table->foreignUuid('status_id')->constrained('report_statuses')->restrictOnDelete();
             $table->string('reporter_email')->nullable();
