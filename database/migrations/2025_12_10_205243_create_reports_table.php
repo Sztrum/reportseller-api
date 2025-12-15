@@ -15,7 +15,7 @@ return new class extends AbstractCreateTableMigration
         Schema::create($this->table_name, static function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('listing_id')->constrained('listings')->restrictOnDelete();
-            $table->foreignUuid('status_id')->constrained('report_statuses')->restrictOnDelete();
+            $table->foreignId('status_id')->constrained('report_statuses')->restrictOnDelete();
             $table->string('reporter_email')->nullable();
             $table->text('description');
             $table->text('moderation_note')->nullable();

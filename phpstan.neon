@@ -1,0 +1,13 @@
+parameters:
+  level: 6
+  paths:
+    - app/V1
+    - tests
+    - database
+
+  tmpDir: storage/framework/phpstan
+
+  excludePaths:
+    - vendor
+    - storage
+    - bootstrap/cache

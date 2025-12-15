@@ -14,7 +14,7 @@ return new class extends AbstractCreateTableMigration
     public function up(): void
     {
         Schema::create($this->table_name, static function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->string('slug')->unique();
             $table->string('label');
             $table->timestamps();
