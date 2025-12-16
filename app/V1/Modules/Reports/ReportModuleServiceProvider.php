@@ -9,7 +9,7 @@ use App\V1\Modules\Reports\Application\Providers\ReportRouteServiceProvider;
 
 class ReportModuleServiceProvider extends ModuleServiceProvider
 {
-    public const string MODULE_NAME = 'report';
+    public const MODULE_NAME = 'report';
 
     public function moduleName(): string
     {
