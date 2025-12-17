@@ -14,12 +14,15 @@ return new class extends AbstractCreateTableMigration
     public function up(): void
     {
         Schema::create($this->table_name, static function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('base_url');
+            $table->string('base_url')->unique();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+            $table->index('name');
+            $table->index('base_url');
         });
     }
 };

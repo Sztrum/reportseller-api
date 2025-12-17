@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\Reports\Application\Providers;
+namespace App\V1\Modules\Report\Application\Providers;
 
 use App\V1\Core\Application\Providers\Routes\ApiRouteServiceProvider;
 use App\V1\Modules\User\UI\Http\Controllers\UserController;

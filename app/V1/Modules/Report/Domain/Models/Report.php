@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\Reports\Domain\Models;
+namespace App\V1\Modules\Report\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;

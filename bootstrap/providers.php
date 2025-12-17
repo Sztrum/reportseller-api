@@ -7,5 +7,6 @@ return [
     \App\V1\Modules\Country\CountryModuleServiceProvider::class,
     \App\V1\Modules\Email\EmailModuleServiceProvider::class,
     \App\V1\Modules\User\UserModuleServiceProvider::class,
-    \App\V1\Modules\Reports\ReportModuleServiceProvider::class,
+    \App\V1\Modules\Platform\PlatformModuleServiceProvider::class,
+    \App\V1\Modules\Report\ReportModuleServiceProvider::class,
 ];

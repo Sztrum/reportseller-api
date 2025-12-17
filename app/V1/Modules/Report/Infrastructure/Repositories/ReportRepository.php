@@ -1,9 +1,9 @@
 <?php
 
-namespace App\V1\Modules\Reports\Infrastructure\Repositories;
+namespace App\V1\Modules\Report\Infrastructure\Repositories;
 
 use App\V1\Core\Infrastructure\Repositories\Eloquent\EloquentModelRepository;
-use App\V1\Modules\Reports\Domain\Models\Report;
+use App\V1\Modules\Report\Domain\Models\Report;
 
 class ReportRepository extends EloquentModelRepository
 {
@@ -15,11 +15,5 @@ class ReportRepository extends EloquentModelRepository
     public function moduleName(): string
     {
         return 'report';
-    }
-
-    public function firstById(
-        string $id
-    ): Report {
-        return $this->query()->findOrFail($id);
     }
 }
