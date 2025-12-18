@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\Report;
+namespace App\V1\Modules\ReportCatalog\Report;
 
 use App\V1\Core\Application\Providers\ModuleServiceProvider;
-use App\V1\Modules\Report\Application\Providers\ReportRouteServiceProvider;
+use App\V1\Modules\ReportCatalog\Report\Application\Providers\ReportRouteServiceProvider;
 
 class ReportModuleServiceProvider extends ModuleServiceProvider
 {

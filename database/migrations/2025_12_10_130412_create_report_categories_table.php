@@ -3,21 +3,26 @@
 declare(strict_types=1);
 
 use App\V1\Shared\Migrations\AbstractCreateTableMigration;
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends AbstractCreateTableMigration
 {
-    protected string $table_name = 'report_statuses';
+    protected string $table_name = 'report_categories';
 
     public function up(): void
     {
         Schema::create($this->table_name, static function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('slug')->unique();
-            $table->string('label');
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->unsignedInteger('order')->default(0);
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
+
+            $table->index('slug');
+            $table->index('name');
         });
     }
 };

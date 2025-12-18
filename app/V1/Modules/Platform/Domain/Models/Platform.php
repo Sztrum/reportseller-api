@@ -6,16 +6,18 @@ namespace App\V1\Modules\Platform\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\PlatformFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Platform extends Model
 {
-    use HasFactory;
+    use HasUuids, HasFactory;
 
     protected $fillable = [
         'name',
         'slug',
         'base_url',
+        'order',
         'is_active',
     ];
 
