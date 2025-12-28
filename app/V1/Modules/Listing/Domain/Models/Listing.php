@@ -2,22 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\Platform\Domain\Models;
+namespace App\V1\Modules\Listing\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
-use Database\Factories\PlatformFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Platform extends Model
+class Listing extends Model
 {
-    use HasUuids, HasFactory;
+    use HasUuids;
 
     protected $fillable = [
-        'name',
-        'slug',
-        'base_url',
-        'order',
+        'platform_id',
+        'report_category_id',
+        'external_id',
+        'url',
+        'title',
+        'price',
+        'currency',
+        'location',
+        'thumbnail_url',
         'is_active',
     ];
 
@@ -26,9 +29,4 @@ class Platform extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-    protected static function newFactory(): PlatformFactory
-    {
-        return PlatformFactory::new();
-    }
 }

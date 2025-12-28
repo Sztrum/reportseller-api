@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\Platform\Infrastructure\Repositories;
+namespace App\V1\Modules\Listing\Infrastructure\Repositories;
 
 use App\V1\Core\Infrastructure\Repositories\Eloquent\EloquentModelRepository;
-use App\V1\Modules\Platform\Domain\Models\Platform;
+use App\V1\Modules\Listing\Domain\Models\Listing;
 
-class PlatformRepository extends EloquentModelRepository
+class ListingRepository extends EloquentModelRepository
 {
-    public function model(): Platform
+    public function model(): Listing
     {
-        return new Platform();
+        return new Listing();
     }
 
     public function moduleName(): string
     {
-        return 'platform';
+        return 'listing';
     }
 }

@@ -8,4 +8,6 @@ return [
     \App\V1\Modules\Email\EmailModuleServiceProvider::class,
     \App\V1\Modules\User\UserModuleServiceProvider::class,
     \App\V1\Modules\ReportCatalog\ReportCatalogModuleServiceProvider::class,
+    \App\V1\Modules\Listing\ListingModuleServiceProvider::class,
+
 ];
