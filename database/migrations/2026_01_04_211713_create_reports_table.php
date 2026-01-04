@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
 use App\V1\Shared\Migrations\AbstractCreateTableMigration;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -14,16 +13,29 @@ return new class extends AbstractCreateTableMigration
     {
         Schema::create($this->table_name, static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('listing_id')->constrained('listings')->restrictOnDelete();
-            $table->foreignId('status_id')->constrained('report_statuses')->restrictOnDelete();
-            $table->string('reporter_email')->nullable();
+
+            $table->foreignUuid('listing_id')
+                ->constrained('listings')
+                ->restrictOnDelete();
+
+            $table->foreignUuid('report_status_id')
+                ->constrained('report_statuses')
+                ->restrictOnDelete();
+
+            $table->foreignUuid('report_author_id')
+                ->constrained('report_authors')
+                ->restrictOnDelete();
+
             $table->text('description');
             $table->text('moderation_note')->nullable();
             $table->boolean('is_published')->default(false);
+
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
+
             $table->index('listing_id');
-            $table->index(['status_id', 'is_published', 'published_at']);
+
+            $table->index(['report_status_id', 'is_published', 'published_at']);
         });
     }
 };

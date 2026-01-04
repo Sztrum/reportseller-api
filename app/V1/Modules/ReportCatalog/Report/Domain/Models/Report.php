@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Report extends Model
 {
-    use HasUuids, HasFactory, SoftDeletes;
+    use HasUuids, SoftDeletes;
 
     protected $fillable = [
         'listing_id',
-        'status_id',
-        'reporter_email',
+        'report_status_id',
+        'report_author_id',
         'description',
         'moderation_note',
         'is_published',

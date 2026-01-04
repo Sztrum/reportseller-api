@@ -13,28 +13,26 @@ return new class extends AbstractCreateTableMigration
     {
         Schema::create($this->table_name, static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('platform_id');
-            $table->uuid('report_category_id');
+
+            $table->foreignUuid('platform_id')
+                ->constrained('platforms')
+                ->restrictOnDelete();
+
+            $table->foreignUuid('report_category_id')
+                ->constrained('report_categories')
+                ->restrictOnDelete();
+
             $table->string('external_id')->nullable();
-            $table->string('url', 2048)->unique();
+            $table->string('url', 768)->unique();
             $table->string('title')->nullable();
-            $table->string('price')->nullable();
-            $table->string('currency')->nullable();
+            $table->string('currency', 3)->default('PLN')->nullable();
+            $table->string('seller_type')->nullable();
+            $table->string('seller_name')->nullable();
             $table->string('location')->nullable();
             $table->string('thumbnail_url', 2048)->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(false);
 
             $table->timestamps();
-
-            $table->foreign('platform_id')
-                ->references('id')
-                ->on('platforms')
-                ->restrictOnDelete();
-
-            $table->foreign('report_category_id')
-                ->references('id')
-                ->on('report_categories')
-                ->restrictOnDelete();
 
             $table->index('platform_id');
             $table->index(['platform_id', 'external_id']);
