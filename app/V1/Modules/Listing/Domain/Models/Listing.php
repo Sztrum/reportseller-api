@@ -6,10 +6,11 @@ namespace App\V1\Modules\Listing\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Listing extends Model
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
 
     protected $fillable = [
         'platform_id',

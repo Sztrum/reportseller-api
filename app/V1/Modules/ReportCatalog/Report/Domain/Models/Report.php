@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Report extends Model
 {
-    use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes, HasFactory;
 
     protected $fillable = [
         'listing_id',
@@ -21,10 +21,12 @@ class Report extends Model
         'moderation_note',
         'is_published',
         'published_at',
+        'deleted_at',
     ];
 
     protected $casts = [
         'is_published' => 'bool',
         'published_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 }
