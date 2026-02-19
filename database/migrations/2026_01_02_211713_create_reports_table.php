@@ -30,11 +30,13 @@ return new class extends AbstractCreateTableMigration
             $table->boolean('is_published')->default(false);
 
             $table->timestamp('published_at')->nullable();
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
 
             $table->index('listing_id');
 
-            $table->index(['report_status_id', 'is_published', 'published_at']);
+            $table->index(['report_status_id', 'is_published'], 'reports_status_pub_idx');
+            $table->index(['published_at', 'deleted_at'], 'reports_dates_idx');
         });
     }
 };

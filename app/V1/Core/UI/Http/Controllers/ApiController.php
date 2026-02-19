@@ -26,8 +26,8 @@ class ApiController extends BaseController
      */
     #[NoReturn]
     public function __construct(
-        protected CommandBusInterface $commandBus,
-        private readonly ResponseFactory $responseFactory,
+        protected CommandBusInterface      $commandBus,
+        protected readonly ResponseFactory $responseFactory,
     ) {
     }
 
