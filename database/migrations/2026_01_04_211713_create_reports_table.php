@@ -30,7 +30,7 @@ return new class extends AbstractCreateTableMigration
             $table->boolean('is_published')->default(false);
 
             $table->timestamp('published_at')->nullable();
-            $table->timestamp('deleted_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             $table->index('listing_id');

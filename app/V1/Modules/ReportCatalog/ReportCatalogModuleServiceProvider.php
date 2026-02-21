@@ -23,6 +23,8 @@ class ReportCatalogModuleServiceProvider extends ModuleServiceProvider
 
     public function register(): void
     {
+        parent::register();
+
         $this->app->register(PlatformModuleServiceProvider::class);
         $this->app->register(RaportCategoryModuleServiceProvider::class);
         $this->app->register(RaportStatusModuleServiceProvider::class);

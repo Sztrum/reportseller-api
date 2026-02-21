@@ -17,6 +17,6 @@ class ListingModuleServiceProvider extends ModuleServiceProvider
 
     public function register(): void
     {
-
+        parent::register();
     }
 }

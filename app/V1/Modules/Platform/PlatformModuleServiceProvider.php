@@ -17,6 +17,6 @@ class PlatformModuleServiceProvider extends ModuleServiceProvider
 
     public function register(): void
     {
-
+        parent::register();
     }
 }

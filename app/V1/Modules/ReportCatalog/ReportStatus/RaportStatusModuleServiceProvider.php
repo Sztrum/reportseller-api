@@ -17,6 +17,6 @@ class RaportStatusModuleServiceProvider extends ModuleServiceProvider
 
     public function register(): void
     {
-
+        parent::register();
     }
 }

@@ -21,12 +21,10 @@ class Report extends Model
         'moderation_note',
         'is_published',
         'published_at',
-        'deleted_at',
     ];
 
     protected $casts = [
         'is_published' => 'bool',
         'published_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 }
