@@ -37,7 +37,6 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\V1\Core\UI\Http\Middleware\ForceJsonResponse::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\V1\Core\UI\Http\Middleware\SetAppLocaleByAcceptLanguageHeader::class,
-            'auth:sanctum',
         ]);
 
         $middleware->alias([

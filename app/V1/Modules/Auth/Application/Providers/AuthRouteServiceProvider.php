@@ -15,16 +15,12 @@ class AuthRouteServiceProvider extends ApiRouteServiceProvider
 
     protected function registerRoutes(Registrar $router): void
     {
-        $router->group([
-            'excluded_middleware' => ['auth:sanctum'],
-        ], function (Registrar $router) {
-            $router->post('/login', [AuthController::class, 'login'])->name('login');
-            $router->post('/register', [AuthController::class, 'register'])->name('register');
-            $router->post('/verify-email/{user_id}/email/verify/{hash}', [AuthController::class, 'verifyEmail'])->name('verify-email');
-            $router->post('/user/{user_id}/new-password/{remember_token}', [AuthController::class, 'newPassword'])->name('new-password');
-            $router->post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
-            $router->post('/reset-password/{remember_token}', [AuthController::class, 'resetPassword'])->name('reset-password');
-        });
+        $router->post('/login', [AuthController::class, 'login'])->name('login');
+        $router->post('/register', [AuthController::class, 'register'])->name('register');
+        $router->post('/verify-email/{user_id}/email/verify/{hash}', [AuthController::class, 'verifyEmail'])->name('verify-email');
+        $router->post('/user/{user_id}/new-password/{remember_token}', [AuthController::class, 'newPassword'])->name('new-password');
+        $router->post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
+        $router->post('/reset-password/{remember_token}', [AuthController::class, 'resetPassword'])->name('reset-password');
 
         $router->get('/profile', [AuthController::class, 'profile'])->name('profile');
         $router->get('/logout', [AuthController::class, 'logout'])->name('logout');

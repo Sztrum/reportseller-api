@@ -12,6 +12,11 @@ class ReportRouteServiceProvider extends ApiRouteServiceProvider
 {
     protected function registerRoutes(Registrar $router): void
     {
+        $router->group([
+            'middleware' => ['auth:sanctum'],
+        ], function (Registrar $router) {
+            $router->post('/delete', [ReportController::class, 'delete'])->name('delete');
+        });
         $router->post('/store', [ReportController::class, 'store'])->name('store');
     }
 }
