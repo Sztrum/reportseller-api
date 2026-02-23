@@ -18,4 +18,12 @@ class ListingRepository extends EloquentModelRepository
     {
         return 'listing';
     }
+
+    public function firstByExternalId(
+        string $externalId
+    ): Listing {
+        return $this->query()
+            ->where('external_id', $externalId)
+            ->firstOrFail();
+    }
 }

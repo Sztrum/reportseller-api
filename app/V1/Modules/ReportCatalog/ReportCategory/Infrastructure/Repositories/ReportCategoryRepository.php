@@ -18,4 +18,12 @@ class ReportCategoryRepository extends EloquentModelRepository
     {
         return 'report-category';
     }
+
+    public function firstBySlug(
+        string $slug
+    ): ?ReportCategory {
+        return $this->query()
+            ->where('slug', $slug)
+            ->first();
+    }
 }

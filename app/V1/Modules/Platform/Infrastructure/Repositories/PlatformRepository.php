@@ -18,4 +18,12 @@ class PlatformRepository extends EloquentModelRepository
     {
         return 'platform';
     }
+
+    public function firstBySlug(
+        string $slug
+    ): ?Platform {
+        return $this->query()
+            ->where('slug', $slug)
+            ->first();
+    }
 }

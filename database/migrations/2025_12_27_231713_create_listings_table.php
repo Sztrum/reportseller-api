@@ -29,6 +29,7 @@ return new class extends AbstractCreateTableMigration
             $table->string('seller_name')->nullable();
             $table->string('location')->nullable();
             $table->string('thumbnail_url', 2048)->nullable();
+            $table->boolean('is_active_external')->default(true);
             $table->boolean('is_active')->default(false);
 
             $table->timestamps();

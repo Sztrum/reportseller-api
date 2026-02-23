@@ -20,12 +20,16 @@ class Listing extends Model
         'title',
         'price',
         'currency',
+        'seller_type',
+        'seller_name',
         'location',
         'thumbnail_url',
+        'is_active_external',
         'is_active',
     ];
 
     protected $casts = [
+        'is_active_external' => 'bool',
         'is_active' => 'bool',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

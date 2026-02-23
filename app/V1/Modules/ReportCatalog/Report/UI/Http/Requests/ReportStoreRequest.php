@@ -27,6 +27,7 @@ class ReportStoreRequest extends BaseRequest
             'listing.seller_type' => ['nullable', 'in:private,business'],
 
             'report' => ['required', 'array'],
+            'report.title' => ['required', 'string', 'min:5 ', 'max:255'],
             'report.description' => ['required', 'string', 'min:10', 'max:5000'],
 
             'author' => ['nullable', 'array'],
