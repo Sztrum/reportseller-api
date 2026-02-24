@@ -8,14 +8,15 @@ use App\V1\Core\Domain\Exceptions\DomainException;
 
 class PlatformBySlugNotFoundException extends DomainException
 {
-    public function __construct(
-        string $message = '',
-        array $replace = []
-    ) {
-        if ($message === '') {
-            $message = __('platform::exceptions.other.platform_slug_not_found', $replace);
-        }
+    /**
+     * @see app/V1/Modules/Platform/Application/Translations/pl/exceptions.php
+     */
+    private const DEFAULT_MESSAGE_KEY = 'platform::exceptions.other.platform_slug_not_found';
 
-        parent::__construct($message, $replace);
+    public function __construct(
+        ?string $message = null,
+        array $replace = [],
+    ) {
+        parent::__construct($message ?? self::resolveDefaultMessage(self::DEFAULT_MESSAGE_KEY, $replace), $replace);
     }
 }
