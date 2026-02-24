@@ -2,7 +2,7 @@
 
 1. Add Laradock as a submodule:
    ```bash
-   git submodule add -f https://github.com/Laradock/laradock.git
+   git clone add -f https://github.com/Laradock/laradock.git
    ```
 2. Copy the contents of `.laradock` to the `laradock` directory, overwriting existing files.
 3. Inside `laradock`, copy `.env.example` to `.env`.

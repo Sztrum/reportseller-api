@@ -65,9 +65,12 @@ class UserRepository extends EloquentModelRepository
     public function findByRememberToken(
         string $remember_token
     ): User {
-        return $this->model()
+        /** @var User $user */
+        $user = $this->model()
             ->query()
             ->where('remember_token', $remember_token)
             ->firstOrFail();
+
+        return $user;
     }
 }
