@@ -1,14 +1,16 @@
 ### Laradock Configuration
 
-1. Add Laradock as a submodule:
+1. Important: disable secure boot in BIOS
+2. Add Laradock:
    ```bash
-   git submodule add -f https://github.com/Laradock/laradock.git
+   git clone https://github.com/Laradock/laradock.git laradock
    ```
-2. Copy the contents of `.laradock` to the `laradock` directory, overwriting existing files.
+3. Copy the contents of `.laradock` to the `laradock` directory, overwriting existing files.
+- Using `cp -rT .laradock laradock` command.
 3. Inside `laradock`, copy `.env.example` to `.env`.
 4. In the `.env` file, set the following:
    ```
-   PHP_VERSION=8.3
+   PHP_VERSION=8.5
    PHP_WORKER_INSTALL_REDIS=true
    PHP_WORKER_INSTALL_GD=true
    PHP_FPM_INSTALL_EXIF=true
@@ -21,6 +23,7 @@
    WORKSPACE_INSTALL_SOAP=true
    PHP_FPM_INSTALL_SOAP=true
    PHP_WORKER_INSTALL_SOAP=true
+   WORKSPACE_AST_VERSION=1.1.2
    WORKSPACE_NODE_VERSION=24
    ```
    
