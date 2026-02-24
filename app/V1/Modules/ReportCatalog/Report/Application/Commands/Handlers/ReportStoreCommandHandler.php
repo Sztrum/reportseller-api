@@ -32,6 +32,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
     ): void {
         $this->reportAggregate->checkIfPlatformExistsBySlug($command->listingDTO->platform_slug);
 
+
         // TODO: Move to aggregate
         $category = $this->reportCategoryRepository->firstBySlug(
             $command->listingDTO->report_category_slug

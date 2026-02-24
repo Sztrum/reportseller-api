@@ -43,4 +43,9 @@ class ReportStoreRequest extends BaseRequest
             'attachments.*.size_bytes' => ['nullable', 'integer', 'min:1', 'max:50000000'],
         ];
     }
+
+    public function messages(): array
+    {
+        return trans('report::validation.custom');
+    }
 }

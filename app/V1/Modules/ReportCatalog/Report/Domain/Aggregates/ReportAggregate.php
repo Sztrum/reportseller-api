@@ -21,7 +21,7 @@ readonly class ReportAggregate
         string $slug
     ): self {
         throw_if(
-            $this->repository->findBySlug($slug),
+            !$this->repository->findBySlug($slug),
             PlatformBySlugNotFoundException::class,
             __('platform::domain.platform_by_slug_not_found')
         );
