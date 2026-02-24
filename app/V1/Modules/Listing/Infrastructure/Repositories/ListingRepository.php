@@ -24,6 +24,6 @@ class ListingRepository extends EloquentModelRepository
     ): Listing {
         return $this->query()
             ->where('external_id', $externalId)
-            ->firstOrFail();
+            ->first();
     }
 }

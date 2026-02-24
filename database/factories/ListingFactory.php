@@ -22,9 +22,12 @@ final class ListingFactory extends Factory
             'title' => $this->faker->sentence(6),
             'price' => $this->faker->optional()->numberBetween(1_000, 50_000_000),
             'currency' => 'PLN',
+            'seller_type' => $this->faker->optional()->randomElement(['private', 'business']),
+            'seller_name' => $this->faker->optional()->name(),
             'location' => $this->faker->optional()->city(),
             'thumbnail_url' => null,
-            'seller_type' => $this->faker->optional()->randomElement(['private', 'business']),
+            'is_active_external' => true,
+            'is_active' => false,
         ];
     }
 }

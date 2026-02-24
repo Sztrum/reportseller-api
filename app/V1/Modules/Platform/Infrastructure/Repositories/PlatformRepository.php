@@ -19,7 +19,7 @@ class PlatformRepository extends EloquentModelRepository
         return 'platform';
     }
 
-    public function firstBySlug(
+    public function findBySlug(
         string $slug
     ): ?Platform {
         return $this->query()

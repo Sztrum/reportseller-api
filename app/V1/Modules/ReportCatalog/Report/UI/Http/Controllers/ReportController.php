@@ -19,7 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ReportController extends ApiController
 {
-
     public function __construct(
         CommandBusInterface $commandBus,
         ResponseFactory $responseFactory,

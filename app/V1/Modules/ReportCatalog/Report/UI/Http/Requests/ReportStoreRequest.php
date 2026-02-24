@@ -21,10 +21,11 @@ class ReportStoreRequest extends BaseRequest
             'listing.title' => ['nullable', 'string', 'max:191'],
             'listing.price' => ['nullable', 'integer', 'min:0', 'max:999999999999'],
             'listing.currency' => ['nullable', 'string', 'size:3'],
+            'listing.seller_type' => ['nullable', 'in:private,business'],
+            'listing.seller_name' => ['nullable', 'string', 'max:255'],
             'listing.location' => ['nullable', 'string', 'max:191'],
             'listing.thumbnail_url' => ['nullable', 'string', 'max:2048', 'url'],
-            'listing.is_active' => ['nullable', 'boolean'],
-            'listing.seller_type' => ['nullable', 'in:private,business'],
+            'listing.is_active_external' => ['nullable', 'boolean'],
 
             'report' => ['required', 'array'],
             'report.title' => ['required', 'string', 'min:5 ', 'max:255'],

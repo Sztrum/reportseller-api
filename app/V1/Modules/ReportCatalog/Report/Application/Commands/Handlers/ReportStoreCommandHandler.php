@@ -7,18 +7,18 @@ namespace App\V1\Modules\ReportCatalog\Report\Application\Commands\Handlers;
 use App\V1\Core\Application\Command\CommandHandlerInterface;
 use App\V1\Core\Application\Command\CommandInterface;
 use App\V1\Modules\Listing\Infrastructure\Repositories\ListingRepository;
-use App\V1\Modules\Platform\Infrastructure\Repositories\PlatformRepository;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
+use App\V1\Modules\ReportCatalog\Report\Domain\Aggregates\ReportAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 
-class ReportStoreCommandHandler implements CommandHandlerInterface
+readonly class ReportStoreCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private readonly PlatformRepository $platformRepository,
-        private readonly ReportCategoryRepository $reportCategoryRepository,
-        private readonly ListingRepository $listingRepository,
+        private ReportAggregate $reportAggregate,
+        private ReportCategoryRepository $reportCategoryRepository,
+        private ListingRepository $listingRepository,
     ) {
     }
 
@@ -30,16 +30,7 @@ class ReportStoreCommandHandler implements CommandHandlerInterface
     public function handle(
         CommandInterface $command
     ): void {
-
-        // TODO: Move to aggregate
-        $platform = $this->platformRepository->firstBySlug(
-            $command->listingDTO->platform_slug
-        );
-//        if ($platform === null) {
-//            throw new PlatformNotFoundException(
-//                $command->listingDTO->platform_slug
-//            );
-//        }
+        $this->reportAggregate->checkIfPlatformExistsBySlug($command->listingDTO->platform_slug);
 
         // TODO: Move to aggregate
         $category = $this->reportCategoryRepository->firstBySlug(
@@ -51,10 +42,11 @@ class ReportStoreCommandHandler implements CommandHandlerInterface
 //            );
 //        }
 
+        // TODO: move to aggregate
         // TODO: save listing, and report, and author, and attachments
         $listing = $this->listingRepository->firstByExternalId($command->listingDTO->external_id);
 
-        if(!$listing) {
+        if($listing === null) {
             $this->listingRepository->create([
                 "platform_id" => $platform->id,
                 "report_category_id" => $category->id,
@@ -63,10 +55,13 @@ class ReportStoreCommandHandler implements CommandHandlerInterface
                 'title' => $command->listingDTO->title,
                 'price' => $command->listingDTO->price,
                 'currency' => $command->listingDTO->currency,
+                'seller_type' => $command->listingDTO->seller_type,
+                'seller_name' => $command->listingDTO->seller_name,
                 'location' => $command->listingDTO->location,
                 'thumbnail_url' => $command->listingDTO->thumbnail_url,
-                'is_active_external' => $command->listingDTO->is_active,
+                'is_active_external' => $command->listingDTO->is_active_external,
             ]);
         }
+
     }
 }

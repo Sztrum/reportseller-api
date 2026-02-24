@@ -24,6 +24,7 @@ return new class extends AbstractCreateTableMigration
             $table->string('external_id')->nullable();
             $table->string('url', 768)->unique();
             $table->string('title')->nullable();
+            $table->string('price', 12)->nullable();
             $table->string('currency', 3)->default('PLN')->nullable();
             $table->string('seller_type')->nullable();
             $table->string('seller_name')->nullable();
