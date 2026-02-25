@@ -23,8 +23,9 @@
    WORKSPACE_INSTALL_SOAP=true
    PHP_FPM_INSTALL_SOAP=true
    PHP_WORKER_INSTALL_SOAP=true
-   WORKSPACE_AST_VERSION=1.1.2
-   WORKSPACE_NODE_VERSION=24
+   PHP_FPM_INSTALL_OPCACHE=false
+   WORKSPACE_AST_VERSION=1.1.3
+   WORKSPACE_NODE_VERSION=22
    ```
    
    Additionally, update all container user IDs to avoid clashes with the base image:
@@ -64,5 +65,5 @@
 1. Copy `.git-sample/hooks/post-merge` file to `.git/hooks/post-merge` you can use `cp .git-sample/hooks/post-merge .git/hooks/post-merge` command.
 2. Also run `chmod +x .git/hooks/post-merge` command.
 
-### Docker, configure to not restart after docker restart
+### Configure to not restart after docker restart
 `sed -i 's/restart: always/restart: "no"/g' laradock/docker-compose.yml && cd laradock && sh start.sh && sh stop.sh && cd ../`
