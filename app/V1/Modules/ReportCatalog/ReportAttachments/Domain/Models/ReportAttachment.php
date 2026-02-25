@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\V1\Modules\ReportCatalog\ReportAttachments\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ReportAttachment extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'report_id',

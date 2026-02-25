@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\V1\Modules\User\Domain\Aggregates;
 
 use App\V1\Modules\Auth\Domain\Exceptions\AuthException;
-use App\V1\Modules\Company\Domain\Models\Company;
 use App\V1\Modules\User\Domain\Exceptions\ErrorWhileResetPasswordException;
 use App\V1\Modules\User\Domain\Exceptions\InvalidEmailVerificationHashException;
 use App\V1\Modules\User\Domain\Exceptions\UserEmailAlreadyVerifiedException;
@@ -15,7 +14,6 @@ use App\V1\Modules\User\Domain\Exceptions\UserWithEmailExistsException;
 use App\V1\Modules\User\Domain\Exceptions\UserWithEmailNotExistsException;
 use App\V1\Modules\User\Domain\Models\User;
 use App\V1\Modules\User\Infrastructure\Repositories\UserRepository;
-use Exception;
 use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 use Illuminate\Contracts\Hashing\Hasher;
 use Throwable;
@@ -24,20 +22,8 @@ readonly class UserAggregate
 {
     public function __construct(
         private UserRepository $repository,
-        private Hasher         $hasher
+        private Hasher $hasher
     ) {
-    }
-
-    public function determineIfGivenUserCanListChildrenCompanies(
-        User $user,
-        Company $company,
-    ): bool {
-        // TODO: determine if user can list children companies of given company
-
-        //        throw_if(
-        //            $userId !== $authorizedUserId,
-        //            new UserNotFoundException()
-        //        );
     }
 
     /**
@@ -45,107 +31,70 @@ readonly class UserAggregate
      */
     public function checkUserWithEmailAlreadyExist(
         string $email
-    ): self {
-        throw_if(
-            $this->repository->firstByEmail($email),
-            UserWithEmailExistsException::class,
-            __('user::domain.user_with_email_already_exist')
-        );
-
-        return $this;
+    ): void {
+        $this->ensureUserNotExists($this->repository->firstByEmail($email));
     }
 
     /**
-     * @throws Throwable
+     * @throws InvalidEmailVerificationHashException|Throwable
      */
     public function verifyEmailVerificationHash(
         User $user,
-        string $hash
-    ): self {
-        throw_if(
-            !$user->verifyEmailVerificationHash($hash),
-            InvalidEmailVerificationHashException::class,
-            __('user::domain.invalid_email_verification_hash')
-        );
-
-        return $this;
+        string $hash,
+        string $exception = InvalidEmailVerificationHashException::class
+    ): void {
+        throw_if(!$user->verifyEmailVerificationHash($hash), $exception);
     }
 
     /**
-     * @throws Throwable
+     * @throws UserEmailAlreadyVerifiedException|Throwable
      */
     public function userEmailAlreadyVerified(
-        User $user
-    ): self {
-        try {
-            $this->validateVerifiedEmail($user);
-        } catch (Exception $exception) {
-            return $this;
-        }
-
-        throw new UserEmailAlreadyVerifiedException(
-            __('user::domain.user_email_already_confirmed')
-        );
+        User $user,
+        string $exception = UserEmailAlreadyVerifiedException::class
+    ): void {
+        throw_if($user->hasVerifiedEmail(), $exception);
     }
 
     /**
-     * @throws Throwable
+     * @throws UserEmailIsNotVerifiedException|Throwable
      */
     public function validateVerifiedEmail(
-        User $user
-    ): self {
-        throw_if(
-            !$user->hasVerifiedEmail(),
-            UserEmailIsNotVerifiedException::class,
-            __('user::domain.user_email_is_not_verified')
-        );
-
-        return $this;
+        User $user,
+        string $exception = UserEmailIsNotVerifiedException::class
+    ): void {
+        throw_if(!$user->hasVerifiedEmail(), $exception);
     }
 
     /**
      * @throws Throwable
      */
-    public function verifyPassword(User $user, string $password): self
-    {
-        throw_if(
-            !$this->hasher->check($password, $user->password),
-            new AuthException(__('auth::messages.auth_failed'))
-        );
-
-        return $this;
+    public function verifyPassword(
+        User $user,
+        string $password,
+        string $exception = AuthException::class,
+    ): void {
+        throw_if(!$this->hasher->check($password, $user->password), $exception);
     }
 
     /**
-     * @throws Throwable
+     * @throws UserWithEmailNotExistsException|Throwable
      */
     public function checkUserWithEmailNotExist(
-        string $email
-    ): self {
-        try {
-            $this->checkUserWithEmailAlreadyExist($email);
-        } catch (Exception $exception) {
-            return $this;
-        }
-
-        throw new UserWithEmailNotExistsException(
-            __('user::domain.user_with_email_not_exist')
-        );
+        string $email,
+        string $exception = UserWithEmailNotExistsException::class
+    ): void {
+        $this->ensureUserExists($this->repository->firstByEmail($email), $exception);
     }
 
     /**
-     * @throws Throwable
+     * @throws ErrorWhileResetPasswordException|Throwable
      */
     public function verifyResetPasswordStatus(
-        string $status
-    ): self {
-        throw_if(
-            $status !== PasswordBrokerContract::PASSWORD_RESET,
-            ErrorWhileResetPasswordException::class,
-            __("auth::{$status}")
-        );
-
-        return $this;
+        string $status,
+        string $exception = ErrorWhileResetPasswordException::class,
+    ): void {
+        throw_if($status !== PasswordBrokerContract::PASSWORD_RESET, $exception);
     }
 
     /**
@@ -153,7 +102,18 @@ readonly class UserAggregate
      */
     public function ensureUserExists(
         ?User $user,
+        string $exception = UserNotFoundException::class,
     ): void {
-        throw_if(!$user, new UserNotFoundException());
+        throw_if($user === null, $exception);
+    }
+
+    /**
+     * @throws UserWithEmailExistsException|Throwable
+     */
+    public function ensureUserNotExists(
+        ?User $user,
+        string $exception = UserWithEmailExistsException::class,
+    ): void {
+        throw_if($user !== null, $exception);
     }
 }

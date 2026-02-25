@@ -6,12 +6,11 @@ namespace App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\ReportStatusFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ReportStatus extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'slug',
@@ -21,8 +20,6 @@ class ReportStatus extends Model
 
     protected $casts = [
         'is_active' => 'bool',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     protected static function newFactory(): ReportStatusFactory

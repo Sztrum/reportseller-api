@@ -28,28 +28,19 @@ class ReportController extends ApiController
     public function store(
         ReportStoreRequest $request
     ): JsonResponse {
-
-        try {
-            $this->commandBus->dispatch(
-                new ReportStoreCommand(
-                    listingDTO: ListingDTO::from($request->input('listing')),
-                    reportDTO: ReportDTO::from($request->input('report')),
-                    authorDTO: AuthorDTO::from($request->input('author', [])),
-                    attachmentsDTO: new AttachmentsDTO(
-                        items: array_map(
-                            static fn (array $a): AttachmentDTO => AttachmentDTO::from($a),
-                            $request->input('attachments', [])
-                        )
-                    ),
-                )
-            );
-        } catch (\Throwable $exception) {
-            return $this->responseFactory->json([
-                'status' => Response::HTTP_OK,
-                'message' => __('report-catalog::messages.store_report_failed'),
-                'errors' => $exception->getMessage(),
-            ]);
-        }
+        $this->commandBus->dispatch(
+            new ReportStoreCommand(
+                listingDTO: ListingDTO::from($request->input('listing')),
+                reportDTO: ReportDTO::from($request->input('report')),
+                authorDTO: AuthorDTO::from($request->input('author', [])),
+                attachmentsDTO: new AttachmentsDTO(
+                    items: array_map(
+                        static fn (array $a): AttachmentDTO => AttachmentDTO::from($a),
+                        $request->input('attachments', [])
+                    )
+                ),
+            )
+        );
 
         return $this->responseFactory->json([
             'status' => Response::HTTP_OK,

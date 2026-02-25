@@ -7,6 +7,8 @@ namespace App\V1\Modules\ReportCatalog\Report\Application\Commands\Handlers;
 use App\V1\Core\Application\Command\CommandHandlerInterface;
 use App\V1\Core\Application\Command\CommandInterface;
 use App\V1\Modules\Listing\Infrastructure\Repositories\ListingRepository;
+use App\V1\Modules\Platform\Domain\Exceptions\PlatformNotFoundException;
+use App\V1\Modules\Platform\Infrastructure\Repositories\PlatformRepository;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
 use App\V1\Modules\ReportCatalog\Report\Domain\Aggregates\ReportAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
@@ -19,6 +21,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         private ReportAggregate $reportAggregate,
         private ReportCategoryRepository $reportCategoryRepository,
         private ListingRepository $listingRepository,
+        private PlatformRepository $platformRepository,
     ) {
     }
 
@@ -30,7 +33,10 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
     public function handle(
         CommandInterface $command
     ): void {
-        $this->reportAggregate->checkIfPlatformExistsBySlug($command->listingDTO->platform_slug);
+        $platform = $this->platformRepository->fistBySlug($command->listingDTO->platform_slug);
+        $this->reportAggregate->ensurePlatformExists($platform);
+
+
 
 
         // TODO: Move to aggregate

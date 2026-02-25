@@ -6,12 +6,12 @@ namespace App\V1\Modules\Platform\Domain\Exceptions;
 
 use App\V1\Core\Domain\Exceptions\DomainException;
 
-class PlatformBySlugNotFoundException extends DomainException
+class PlatformNotFoundException extends DomainException
 {
     /**
      * @see app/V1/Modules/Platform/Application/Translations/pl/exceptions.php
      */
-    private const DEFAULT_MESSAGE_KEY = 'platform::exceptions.other.platform_slug_not_found';
+    private const DEFAULT_MESSAGE_KEY = 'platform::exceptions.other.platform_not_found';
 
     public function __construct(
         ?string $message = null,

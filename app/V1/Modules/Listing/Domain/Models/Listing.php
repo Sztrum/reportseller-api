@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace App\V1\Modules\Listing\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Listing extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'platform_id',
@@ -31,7 +30,5 @@ class Listing extends Model
     protected $casts = [
         'is_active_external' => 'bool',
         'is_active' => 'bool',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 }

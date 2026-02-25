@@ -6,12 +6,11 @@ namespace App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\ReportCategoryFactory;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ReportCategory extends Model
 {
-    use HasUuids, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'slug',
@@ -23,8 +22,6 @@ class ReportCategory extends Model
 
     protected $casts = [
         'is_active' => 'bool',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
     protected static function newFactory(): ReportCategoryFactory

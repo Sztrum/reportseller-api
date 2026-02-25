@@ -10,17 +10,21 @@ use Throwable;
 
 class AuthException extends ForbiddenException
 {
+    private const DEFAULT_MESSAGE_KEY = 'auth::messages.auth_failed';
+
     public function __construct(
-        string $message = null,
+        ?string $message = null,
         public int $statusCode = Response::HTTP_FORBIDDEN,
-        Throwable $previous = null,
+        ?Throwable $previous = null,
         array $headers = [],
         int $code = 0
     ) {
-        if (!$message) {
-            $message = __('auth::messages.auth_failed');
-        }
-
-        parent::__construct($message, $statusCode, $previous, $headers, $code);
+        parent::__construct(
+            $message ?? self::resolveDefaultMessage(self::DEFAULT_MESSAGE_KEY),
+            $statusCode,
+            $previous,
+            $headers,
+            $code
+        );
     }
 }
