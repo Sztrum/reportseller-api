@@ -39,5 +39,6 @@ class CoreModuleServiceProvider extends ModuleServiceProvider
         $this->app->register(CoreRouteServiceProvider::class);
         $this->app->register(ViteHmrServiceProvider::class);
         $this->app->register(SanctumServiceProvider::class);
+        $this->app->register(TelescopeServiceProvider::class);
     }
 }

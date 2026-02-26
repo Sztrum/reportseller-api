@@ -10,7 +10,7 @@
         "barryvdh/laravel-ide-helper": "^3.1",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
-        "laravel/telescope": "*",
+        "laravel/telescope": "^5.18",
         "laravel/tinker": "^2.9",
         "spatie/laravel-collection-macros": "^8.0",
         "spatie/laravel-data": "*"
@@ -73,7 +73,9 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "laravel/telescope"
+            ]
         }
     },
     "config": {
