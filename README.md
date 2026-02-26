@@ -65,5 +65,50 @@
 1. Copy `.git-sample/hooks/post-merge` file to `.git/hooks/post-merge` you can use `cp .git-sample/hooks/post-merge .git/hooks/post-merge` command.
 2. Also run `chmod +x .git/hooks/post-merge` command.
 
+## Codex CLI setup
+
+To enable commonly used Codex terminal actions without repeated approvals, update your local Codex config.
+
+1. Edit `~/.codex/config.toml` and add:
+   ```toml
+   approval_policy = "on-request"
+   sandbox_mode = "workspace-write"
+
+   [sandbox_workspace_write]
+   network_access = true
+   writable_roots = [
+     "<PROJECT_PATH>",
+     "/tmp",
+     "<YOUR_HOME>/.gnupg",
+     "<YOUR_HOME>/.gitconfig"
+   ]
+   ```
+   Notes:
+    - Use absolute paths in `writable_roots`.
+    - Replace `<YOUR_HOME>` and `<PROJECT_PATH>` with your local values, for example:
+        - `<YOUR_HOME>` -> `/home/alice`
+        - `<PROJECT_PATH>` -> `/home/alice/projects/php8.3/configurator`
+    - Each developer should set their own home/project paths; do not hardcode one user path for everyone.
+2. Edit `~/.codex/rules/default.rules` and add:
+   ```python
+   prefix_rule(pattern = ["gh", "pr"], decision = "allow")
+   prefix_rule(pattern = ["gh", "api"], decision = "allow")
+   prefix_rule(pattern = ["git", "push"], decision = "allow")
+   prefix_rule(pattern = ["git", "pull"], decision = "allow")
+   prefix_rule(pattern = ["git", "checkout"], decision = "allow")
+   prefix_rule(pattern = ["git", "switch"], decision = "allow")
+   prefix_rule(pattern = ["cat"], decision = "allow")
+   prefix_rule(pattern = ["bash"], decision = "allow")
+   prefix_rule(pattern = ["/bin/bash"], decision = "allow")
+   ```
+3. Restart Codex CLI.
+4. Optionally verify rule matching:
+   ```bash
+   codex execpolicy check --pretty --rules ~/.codex/rules/default.rules -- gh pr view 1
+   codex execpolicy check --pretty --rules ~/.codex/rules/default.rules -- git push
+   ```
+
+Note: `cat > file` uses shell redirection and may still be evaluated as `bash -lc ...`, not plain `cat`.
+
 ### Configure to not restart after docker restart
 `sed -i 's/restart: always/restart: "no"/g' laradock/docker-compose.yml && cd laradock && sh start.sh && sh stop.sh && cd ../`
