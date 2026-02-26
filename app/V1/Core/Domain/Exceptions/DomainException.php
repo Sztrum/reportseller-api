@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace App\V1\Core\Domain\Exceptions;
 
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class DomainException extends HttpException
 {
-    public function __construct(string $message = '', array $replace = [])
-    {
-        parent::__construct(__($message, $replace), Response::HTTP_UNPROCESSABLE_ENTITY);
+    public function __construct(
+        ?string $message = null,
+        array $replace = [],
+        ?Throwable $previous = null,
+        array $headers = [],
+        int $code = 0,
+    ) {
+        parent::__construct($message ?? '', Response::HTTP_UNPROCESSABLE_ENTITY, $previous, $headers, $code);
     }
 }

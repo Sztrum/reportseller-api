@@ -34,9 +34,9 @@ class AuthController extends ApiController
 {
     public function __construct(
         CommandBusInterface $commandBus,
-        private readonly ResponseFactory $responseFactory,
-        private readonly AuthService $authService,
-        private readonly UserRepository $userRepository,
+        ResponseFactory $responseFactory,
+        private readonly AuthService       $authService,
+        private readonly UserRepository    $userRepository,
     ) {
         parent::__construct($commandBus, $responseFactory);
     }
