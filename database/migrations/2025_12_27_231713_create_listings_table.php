@@ -24,6 +24,7 @@ return new class extends AbstractCreateTableMigration
             $table->string('external_id')->nullable();
             $table->string('url', 768)->unique();
             $table->string('title')->nullable();
+            $table->text('description')->nullable();
             $table->string('price', 12)->nullable();
             $table->string('currency', 3)->default('PLN')->nullable();
             $table->string('seller_type')->nullable();
@@ -36,7 +37,7 @@ return new class extends AbstractCreateTableMigration
             $table->timestamps();
 
             $table->index('platform_id');
-            $table->index(['platform_id', 'external_id']);
+            $table->unique(['platform_id', 'external_id'], 'listings_platform_external_id_unique');
         });
     }
 };

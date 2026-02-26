@@ -17,6 +17,7 @@ class Listing extends Model
         'external_id',
         'url',
         'title',
+        'description',
         'price',
         'currency',
         'seller_type',
@@ -28,6 +29,7 @@ class Listing extends Model
     ];
 
     protected $casts = [
+        'price' => 'float',
         'is_active_external' => 'bool',
         'is_active' => 'bool',
     ];

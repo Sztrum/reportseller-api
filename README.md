@@ -27,7 +27,7 @@
    WORKSPACE_AST_VERSION=1.1.3
    WORKSPACE_NODE_VERSION=22
    ```
-   
+
    Additionally, update all container user IDs to avoid clashes with the base image:
    ```
    WORKSPACE_PUID=1001

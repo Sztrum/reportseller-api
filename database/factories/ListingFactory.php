@@ -20,6 +20,7 @@ final class ListingFactory extends Factory
             'external_id' => null,
             'url' => 'https://example.test/listing/' . Str::uuid(),
             'title' => $this->faker->sentence(6),
+            'description' => $this->faker->optional()->paragraphs(3, true),
             'price' => $this->faker->optional()->numberBetween(1_000, 50_000_000),
             'currency' => 'PLN',
             'seller_type' => $this->faker->optional()->randomElement(['private', 'business']),
