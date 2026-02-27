@@ -6,14 +6,15 @@ namespace App\V1\Modules\ReportCatalog\Report\Application\Commands\Handlers;
 
 use App\V1\Core\Application\Command\CommandHandlerInterface;
 use App\V1\Core\Application\Command\CommandInterface;
-use App\V1\Modules\Listing\Infrastructure\Repositories\ListingRepository;
+use App\V1\Modules\Listing\Application\Services\ListingHistorySnapshotService;
 use App\V1\Modules\Listing\Infrastructure\Repositories\ListingHistoryRepository;
+use App\V1\Modules\Listing\Infrastructure\Repositories\ListingRepository;
 use App\V1\Modules\Platform\Domain\Aggregates\PlatformAggregate;
 use App\V1\Modules\Platform\Infrastructure\Repositories\PlatformRepository;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
 use App\V1\Modules\ReportCatalog\Report\Infrastructure\Repositories\ReportRepository;
-use App\V1\Modules\ReportCatalog\ReportAttachments\Infrastructure\Repositories\ReportAuthorsRepository as ReportAttachmentsRepository;
-use App\V1\Modules\ReportCatalog\ReportAuthors\Infrastructure\Repositories\ReportAuthorsRepository;
+use App\V1\Modules\ReportCatalog\ReportAttachment\Infrastructure\Repositories\ReportAttachmentRepository;
+use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\ReportAuthorRepository;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
 use App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories\ReportStatusRepository;
@@ -28,11 +29,12 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         private ReportCategoryRepository $reportCategoryRepository,
         private ListingRepository $listingRepository,
         private ListingHistoryRepository $listingHistoryRepository,
+        private ListingHistorySnapshotService $listingHistorySnapshotService,
         private PlatformRepository $platformRepository,
         private ReportStatusRepository $reportStatusRepository,
         private ReportRepository $reportRepository,
-        private ReportAuthorsRepository $reportAuthorsRepository,
-        private ReportAttachmentsRepository $reportAttachmentsRepository,
+        private ReportAuthorRepository $reportAuthorRepository,
+        private ReportAttachmentRepository $reportAttachmentRepository,
     ) {
     }
 
@@ -46,11 +48,9 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
     ): void {
         $platform = $this->platformRepository->fistBySlug($command->listingDTO->platform_slug);
         $this->platformAggregate->ensurePlatformExists($platform);
-        assert($platform !== null);
 
         $category = $this->reportCategoryRepository->firstBySlug($command->listingDTO->report_category_slug);
         $this->reportCategoryAggregate->ensureReportCategoryExists($category);
-        assert($category !== null);
 
         $listing = null;
         if ($command->listingDTO->external_id !== null) {
@@ -59,12 +59,12 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
                 $platform->id
             );
         }
+
         if ($listing === null) {
             $listing = $this->listingRepository->firstByUrl($command->listingDTO->url);
         }
 
         if ($listing === null) {
-            // TODO: move to aggregate
             $listing = $this->listingRepository->create([
                 "platform_id" => $platform->id,
                 "report_category_id" => $category->id,
@@ -82,55 +82,14 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             ]);
         }
 
-        $lastSnapshot = $this->listingHistoryRepository->latestForListing($listing->id);
-        $snapshot = [
-            'listing_id' => $listing->id,
-            'external_id' => $command->listingDTO->external_id,
-            'url' => $command->listingDTO->url,
-            'title' => $command->listingDTO->title,
-            'description' => $command->listingDTO->description,
-            'price' => $command->listingDTO->price,
-            'currency' => $command->listingDTO->currency,
-            'seller_type' => $command->listingDTO->seller_type,
-            'seller_name' => $command->listingDTO->seller_name,
-            'location' => $command->listingDTO->location,
-            'thumbnail_url' => $command->listingDTO->thumbnail_url,
-            'is_active_external' => $command->listingDTO->is_active_external,
-            'captured_at' => now(),
-        ];
-
-        $hasChanges = $lastSnapshot === null;
-        if ($lastSnapshot !== null) {
-            $fields = [
-                'external_id',
-                'url',
-                'title',
-                'description',
-                'price',
-                'currency',
-                'seller_type',
-                'seller_name',
-                'location',
-                'thumbnail_url',
-                'is_active_external',
-            ];
-
-            foreach ($fields as $field) {
-                if ($lastSnapshot->getAttribute($field) !== $snapshot[$field]) {
-                    $hasChanges = true;
-                    break;
-                }
-            }
-        }
-
-        if ($hasChanges) {
+        $snapshot = $this->listingHistorySnapshotService->getSnapshotIfChanged($listing->id, $command->listingDTO);
+        if ($snapshot !== null) {
             $this->listingHistoryRepository->create($snapshot);
         }
 
         $reportStatus = $this->reportStatusRepository->firstBySlug('new');
-        assert($reportStatus !== null);
 
-        $author = $this->reportAuthorsRepository->create([
+        $author = $this->reportAuthorRepository->create([
             'ip_hash' => null,
             'consent_version' => $command->authorDTO->consent_version,
             'consent_given_at' => $command->authorDTO->consent_given_at,
@@ -142,6 +101,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'listing_id' => $listing->id,
             'report_status_id' => $reportStatus->id,
             'report_author_id' => $author->id,
+            'title' => $command->reportDTO->title,
             'description' => $command->reportDTO->description,
             'moderation_note' => null,
             'is_published' => false,
@@ -149,7 +109,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         ]);
 
         foreach ($command->attachmentsDTO->items as $attachment) {
-            $this->reportAttachmentsRepository->create([
+            $this->reportAttachmentRepository->create([
                 'report_id' => $report->id,
                 'storage_disk' => $attachment->storage_disk,
                 'storage_key' => $attachment->storage_key,

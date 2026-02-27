@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\ReportCatalog\ReportAttachments\Domain\Models;
+namespace App\V1\Modules\ReportCatalog\ReportAttachment\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

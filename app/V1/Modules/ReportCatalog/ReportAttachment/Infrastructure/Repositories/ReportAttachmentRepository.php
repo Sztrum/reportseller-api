@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\ReportCatalog\ReportAttachments\Infrastructure\Repositories;
+namespace App\V1\Modules\ReportCatalog\ReportAttachment\Infrastructure\Repositories;
 
 use App\V1\Core\Infrastructure\Repositories\Eloquent\EloquentModelRepository;
-use App\V1\Modules\ReportCatalog\ReportAttachments\Domain\Models\ReportAttachment;
+use App\V1\Modules\ReportCatalog\ReportAttachment\Domain\Models\ReportAttachment;
 
-class ReportAuthorsRepository extends EloquentModelRepository
+class ReportAttachmentRepository extends EloquentModelRepository
 {
     public function model(): ReportAttachment
     {

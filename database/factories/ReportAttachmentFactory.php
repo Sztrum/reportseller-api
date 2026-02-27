@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\V1\Modules\ReportCatalog\ReportAttachments\Domain\Models\ReportAttachment;
+use App\V1\Modules\ReportCatalog\ReportAttachment\Domain\Models\ReportAttachment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

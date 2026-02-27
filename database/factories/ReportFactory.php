@@ -17,6 +17,7 @@ final class ReportFactory extends Factory
             'listing_id' => $this->faker->uuid(),
             'report_status_id' => $this->faker->uuid(),
             'report_author_id' => $this->faker->uuid(),
+            'title' => $this->faker->sentence(6),
             'description' => $this->faker->paragraphs(2, true),
             'moderation_note' => null,
             'is_published' => false,

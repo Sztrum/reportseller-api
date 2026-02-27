@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\ReportCatalog\ReportAttachments\Domain\DTO;
+namespace App\V1\Modules\ReportCatalog\ReportAttachment\Domain\DTO;
 
 use Spatie\LaravelData\Data;
 

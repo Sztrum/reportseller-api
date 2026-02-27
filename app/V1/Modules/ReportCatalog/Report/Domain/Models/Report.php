@@ -16,6 +16,7 @@ class Report extends Model
         'listing_id',
         'report_status_id',
         'report_author_id',
+        'title',
         'description',
         'moderation_note',
         'is_published',

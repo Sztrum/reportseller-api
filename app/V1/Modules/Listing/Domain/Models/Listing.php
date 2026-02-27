@@ -29,7 +29,7 @@ class Listing extends Model
     ];
 
     protected $casts = [
-        'price' => 'float',
+        'price' => 'integer',
         'is_active_external' => 'bool',
         'is_active' => 'bool',
     ];

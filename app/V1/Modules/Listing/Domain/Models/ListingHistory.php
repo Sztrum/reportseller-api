@@ -28,7 +28,7 @@ class ListingHistory extends Model
     ];
 
     protected $casts = [
-        'price' => 'float',
+        'price' => 'integer',
         'is_active_external' => 'bool',
         'captured_at' => 'datetime',
     ];

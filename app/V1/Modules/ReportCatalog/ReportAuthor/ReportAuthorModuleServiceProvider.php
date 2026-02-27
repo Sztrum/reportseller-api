@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\ReportCatalog\ReportAttachments;
+namespace App\V1\Modules\ReportCatalog\ReportAuthor;
 
 use App\V1\Core\Application\Providers\ModuleServiceProvider;
 
-class ReportAttachmentsModuleServiceProvider extends ModuleServiceProvider
+class ReportAuthorModuleServiceProvider extends ModuleServiceProvider
 {
-    public const MODULE_NAME = 'report-attachments';
+    public const MODULE_NAME = 'report-author';
 
     public function moduleName(): string
     {
