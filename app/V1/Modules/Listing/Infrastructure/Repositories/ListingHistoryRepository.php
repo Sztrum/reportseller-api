@@ -22,10 +22,13 @@ class ListingHistoryRepository extends EloquentModelRepository
     public function latestForListing(
         string $listingId
     ): ?ListingHistory {
-        return $this->query()
+        /** @var ListingHistory|null $listingHistory */
+        $listingHistory = $this->query()
             ->where('listing_id', $listingId)
             ->orderByDesc('captured_at')
             ->orderByDesc('id')
             ->first();
+
+        return $listingHistory;
     }
 }

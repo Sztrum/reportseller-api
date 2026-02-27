@@ -19,10 +19,12 @@ use Throwable;
 
 class ExceptionHandler extends Handler
 {
+    /** @var array<int, class-string<Throwable>> */
     protected $dontReport = [
         RouteNotFoundException::class,
     ];
 
+    /** @var array<int, string> */
     protected $dontFlash = [
         'current_password',
         'password',
@@ -43,20 +45,23 @@ class ExceptionHandler extends Handler
         $exceptionMap = $this->getExceptionMap($isDebug);
 
         foreach ($exceptionMap as $exceptionClass => $response) {
-            if ($e instanceof $exceptionClass) {
-                $responseData = is_callable($response) ? $response($e) : $response;
-
-                if ($isDebug) {
-                    $responseData['data'] = $this->getDebugData($e);
-                }
-
-                return new JsonResponse(
-                    $responseData,
-                    $responseData['status'] ?? Response::HTTP_INTERNAL_SERVER_ERROR,
-                    [],
-                    JSON_UNESCAPED_UNICODE
-                );
+            if (!is_a($e, $exceptionClass, true)) {
+                continue;
             }
+
+            /** @var array<string, mixed> $responseData */
+            $responseData = is_callable($response) ? $response($e) : $response;
+
+            if ($isDebug) {
+                $responseData['data'] = $this->getDebugData($e);
+            }
+
+            return new JsonResponse(
+                $responseData,
+                $responseData['status'] ?? Response::HTTP_INTERNAL_SERVER_ERROR,
+                [],
+                JSON_UNESCAPED_UNICODE
+            );
         }
 
         return $this->buildDefaultResponse($e, $isDebug);
@@ -76,6 +81,9 @@ class ExceptionHandler extends Handler
         return new JsonResponse($responseData, $responseData['status'], [], JSON_UNESCAPED_UNICODE);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getDebugData(Throwable $e): array
     {
         return [
@@ -86,6 +94,9 @@ class ExceptionHandler extends Handler
         ];
     }
 
+    /**
+     * @return array<class-string<Throwable>, array<string, mixed>|callable(Throwable): array<string, mixed>>
+     */
     private function getExceptionMap(bool $isDebug): array
     {
         return [

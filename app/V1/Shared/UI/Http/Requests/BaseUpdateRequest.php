@@ -56,23 +56,20 @@ abstract class BaseUpdateRequest extends FormRequest
         ];
     }
 
-    private function saveContentSectionsToSession()
+    private function saveContentSectionsToSession(): void
     {
         //        dump($this->allFiles());
         //        dd($this->get('content_sections'));
         session()->flash('failedValidationContentSections', $this->get('content_sections'));
     }
 
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator): void
     {
-        /** @var ValidationException $exception */
-        $exception = $validator->getException();
-
         if ($this->get('content_sections')) {
             $this->saveContentSectionsToSession();
         }
 
-        throw (new $exception($validator))
+        throw (new ValidationException($validator))
             ->errorBag($this->errorBag)
             ->redirectTo($this->getRedirectUrl());
     }

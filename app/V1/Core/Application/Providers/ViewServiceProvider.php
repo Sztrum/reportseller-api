@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use ReflectionClass;
-use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 abstract class ViewServiceProvider extends ServiceProvider
 {
@@ -60,9 +60,7 @@ abstract class ViewServiceProvider extends ServiceProvider
                 $tag = $this->getComponentTag($component);
                 $componentPath = $this->moduleName() . '::components.' . $tag;
 
-                if (!is_null($tag)) {
-                    Blade::component($componentPath, $this->moduleName() . '::' . $tag);
-                }
+                Blade::component($componentPath, $this->moduleName() . '::' . $tag);
             }
         }
     }

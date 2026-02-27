@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\V1\Shared\Migrations;
 
-use Doctrine\DBAL\Exception;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
 
@@ -15,17 +14,14 @@ abstract class AbstractMigration extends Migration
     abstract public function up(): void;
     abstract public function down(): void;
 
-    /**
-     * @throws Exception
-     */
     public function hasForeignKey(string $table, string $column): bool
     {
-        $fkColumns = Schema::getConnection()
-            ->getDoctrineSchemaManager()
-            ->listTableForeignKeys($table, config('database.connections.mysql.database'));
+        $foreignKeys = Schema::getConnection()
+            ->getSchemaBuilder()
+            ->getForeignKeys($table);
 
-        return collect($fkColumns)->map(function ($fkColumn) {
-            return $fkColumn->getColumns();
-        })->flatten()->contains($column);
+        return collect($foreignKeys)
+            ->flatMap(static fn (array $foreignKey): array => $foreignKey['columns'] ?? [])
+            ->contains($column);
     }
 }

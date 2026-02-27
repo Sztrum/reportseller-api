@@ -22,21 +22,20 @@ use App\V1\Modules\Auth\UI\Http\Requests\ApiSetNewPasswordRequest;
 use App\V1\Modules\Auth\UI\Http\Requests\ApiVerifyEmailRequest;
 use App\V1\Modules\User\Application\Commands\RegisterUserCommand;
 use App\V1\Modules\User\Domain\Models\User;
-use App\V1\Modules\User\Infrastructure\Repositories\UserRepository;
 use App\V1\Modules\User\UI\Http\Resources\UserResource;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class AuthController extends ApiController
 {
     public function __construct(
         CommandBusInterface $commandBus,
         ResponseFactory $responseFactory,
-        private readonly AuthService       $authService,
-        private readonly UserRepository    $userRepository,
+        private readonly AuthService $authService,
     ) {
         parent::__construct($commandBus, $responseFactory);
     }
@@ -60,9 +59,9 @@ class AuthController extends ApiController
         $user = $request->user();
 
         /** @var PersonalAccessToken $accessToken */
-        $accessToken = $user?->currentAccessToken();
+        $accessToken = $user->currentAccessToken();
 
-        $accessToken?->delete();
+        $accessToken->delete();
 
         return $this->responseFactory->json([
             'status' => Response::HTTP_OK,

@@ -22,26 +22,35 @@ class ListingRepository extends EloquentModelRepository
     public function firstByExternalId(
         string $externalId
     ): ?Listing {
-        return $this->query()
+        /** @var Listing|null $listing */
+        $listing = $this->query()
             ->where('external_id', $externalId)
             ->first();
+
+        return $listing;
     }
 
     public function firstByExternalIdAndPlatform(
         string $externalId,
         string $platformId
     ): ?Listing {
-        return $this->query()
+        /** @var Listing|null $listing */
+        $listing = $this->query()
             ->where('external_id', $externalId)
             ->where('platform_id', $platformId)
             ->first();
+
+        return $listing;
     }
 
     public function firstByUrl(
         string $url
     ): ?Listing {
-        return $this->query()
+        /** @var Listing|null $listing */
+        $listing = $this->query()
             ->where('url', $url)
             ->first();
+
+        return $listing;
     }
 }

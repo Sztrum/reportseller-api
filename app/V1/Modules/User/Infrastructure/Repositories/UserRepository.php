@@ -37,10 +37,12 @@ class UserRepository extends EloquentModelRepository
     public function firstByEmail(
         string $email
     ): ?User {
-        /** @var ?User $user */
-        return $this->query()
+        /** @var User|null $user */
+        $user = $this->query()
             ->where('email', $email)
             ->first();
+
+        return $user;
     }
 
     public function findByIdAndRememberToken(
@@ -57,9 +59,12 @@ class UserRepository extends EloquentModelRepository
     public function findByEmail(
         string $email
     ): User {
-        return $this->query()
+        /** @var User $user */
+        $user = $this->query()
             ->where('email', $email)
             ->firstOrFail();
+
+        return $user;
     }
 
     public function findByRememberToken(

@@ -7,8 +7,6 @@ use App\V1\Shared\Domain\DTO\RemoteImageInfoDTO;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\ImageManager;
 
 if (!function_exists('enum_rand')) {
     /**
@@ -163,14 +161,14 @@ if (!function_exists('get_remote_file_info')) {
 
                     // Determine the appropriate DTO based on the content type
                     if (str_starts_with($contentType, 'image/')) {
-                        // Process image files
-                        $imageManager = new ImageManager(new Driver());
-                        $image = $imageManager->read($content);
+                        $imageSize = @getimagesizefromstring($content);
+                        $imageWidth = is_array($imageSize) ? $imageSize[0] : 0;
+                        $imageHeight = is_array($imageSize) ? $imageSize[1] : 0;
 
                         return RemoteImageInfoDTO::from([
                             'uri' => $url,
-                            'imageWidth' => $image->width(),
-                            'imageHeight' => $image->height(),
+                            'imageWidth' => $imageWidth,
+                            'imageHeight' => $imageHeight,
                             'size' => $size,
                             'contentType' => $contentType,
                         ]);
@@ -205,6 +203,19 @@ if (!function_exists('json_decode_recurrency')) {
         }
 
         return $array;
+    }
+}
+
+if (!function_exists('is_json')) {
+    function is_json(mixed $value): bool
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        json_decode($value, true);
+
+        return json_last_error() === JSON_ERROR_NONE;
     }
 }
 

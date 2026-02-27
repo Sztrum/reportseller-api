@@ -18,7 +18,11 @@ use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\Report
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
 use App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories\ReportStatusRepository;
-use JetBrains\PhpStorm\NoReturn;
+use App\V1\Modules\Listing\Domain\Models\Listing;
+use App\V1\Modules\Platform\Domain\Models\Platform;
+use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\Models\ReportAuthor;
+use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models\ReportCategory;
+use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use Throwable;
 
 readonly class ReportStoreCommandHandler implements CommandHandlerInterface
@@ -42,16 +46,18 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
      * @param  ReportStoreCommand $command
      * @throws Throwable
      */
-    #[NoReturn]
     public function handle(
         CommandInterface $command
     ): void {
+        /** @var Platform|null $platform */
         $platform = $this->platformRepository->fistBySlug($command->listingDTO->platform_slug);
         $this->platformAggregate->ensurePlatformExists($platform);
 
+        /** @var ReportCategory|null $category */
         $category = $this->reportCategoryRepository->firstBySlug($command->listingDTO->report_category_slug);
         $this->reportCategoryAggregate->ensureReportCategoryExists($category);
 
+        /** @var Listing|null $listing */
         $listing = null;
         if ($command->listingDTO->external_id !== null) {
             $listing = $this->listingRepository->firstByExternalIdAndPlatform(
@@ -87,8 +93,10 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             $this->listingHistoryRepository->create($snapshot);
         }
 
+        /** @var ReportStatus|null $reportStatus */
         $reportStatus = $this->reportStatusRepository->firstBySlug('new');
 
+        /** @var ReportAuthor $author */
         $author = $this->reportAuthorRepository->create([
             'ip_hash' => null,
             'consent_version' => $command->authorDTO->consent_version,

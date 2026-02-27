@@ -13,18 +13,22 @@ use Illuminate\Support\ServiceProvider as BaseServiceProvider;
  */
 abstract class CommandBusServiceProvider extends BaseServiceProvider
 {
+    /** @var array<class-string, class-string> */
     protected array $commands = [];
 
     /**
-     * @throws BindingResolutionException;
+     * @throws BindingResolutionException
      */
     public function boot(): void
     {
         $commandBus = $this->app->make(CommandBusInterface::class);
         $commandBus->map($this->commands);
 
-        if (method_exists($this, 'registerCommands')) {
-            $this->app->call([$this, 'registerCommands'], compact('commandBus'));
-        }
+        $this->registerCommands($commandBus);
+    }
+
+    protected function registerCommands(CommandBusInterface $commandBus): void
+    {
+        //
     }
 }

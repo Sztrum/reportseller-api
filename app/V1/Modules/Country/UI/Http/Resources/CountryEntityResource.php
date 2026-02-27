@@ -26,7 +26,9 @@ class CountryEntityResource extends ApiResponseResource
     public function getResource(): CountryEntity
     {
         /** @var CountryEntity $resource */
-        return $this->resource;
+        $resource = $this->resource;
+
+        return $resource;
     }
 
     public function getRelationships(): array

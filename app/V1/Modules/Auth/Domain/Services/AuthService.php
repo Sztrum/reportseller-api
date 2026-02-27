@@ -31,9 +31,8 @@ readonly class AuthService
 
         throw_if(!$user, AuthException::class);
 
-        $this->userAggregate
-            ->validateVerifiedEmail($user)
-            ->verifyPassword($user, $loginDataDTO->password);
+        $this->userAggregate->validateVerifiedEmail($user);
+        $this->userAggregate->verifyPassword($user, $loginDataDTO->password);
 
         return $this->createToken($user);
     }

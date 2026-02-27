@@ -7,6 +7,9 @@ namespace App\V1\Core\Domain\Models;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Support\Str;
 
+/**
+ * @property string $id
+ */
 abstract class Model extends BaseModel
 {
     public $incrementing = false;

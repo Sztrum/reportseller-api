@@ -21,7 +21,9 @@ class UserResource extends ApiResponseResource
     public function getResource(): User
     {
         /** @var User $resource */
-        return $this->resource;
+        $resource = $this->resource;
+
+        return $resource;
     }
 
     public function getRelationships(): array

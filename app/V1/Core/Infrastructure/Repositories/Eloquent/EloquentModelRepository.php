@@ -23,7 +23,10 @@ abstract class EloquentModelRepository implements ModelRepositoryInterface
 
     public function create(array $params): Model
     {
-        return $this->query()->create($params);
+        /** @var Model $model */
+        $model = $this->query()->create($params);
+
+        return $model;
     }
 
     public function update(Model $model, array $params): Model
@@ -53,7 +56,9 @@ abstract class EloquentModelRepository implements ModelRepositoryInterface
     public function firstById(string $id): ?Model
     {
         /** @var Model|null $model */
-        return $this->query()->find($id);
+        $model = $this->query()->find($id);
+
+        return $model;
     }
 
     public function all(): Collection

@@ -75,12 +75,12 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
     public function isSuccessRequest(IncomingEntry $entry): bool
     {
-        return $entry->type === EntryType::REQUEST && ($entry->content['response_status'] ?? 0) === 200;
+        return $entry->type === EntryType::REQUEST && $entry->content['response_status'] === 200;
     }
 
     public function isFailedRequest(IncomingEntry $entry): bool
     {
-        return $entry->type === EntryType::REQUEST && ($entry->content['response_status'] ?? 200) >= 500 && ($entry->content['response_status'] ?? 200) !== 503;
+        return $entry->type === EntryType::REQUEST && $entry->content['response_status'] >= 500 && $entry->content['response_status'] !== 503;
     }
 
     public function isFailedJob(IncomingEntry $entry): bool
@@ -165,7 +165,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     public function isLoginRequest(IncomingEntry $entry, string $method = 'POST'): bool
     {
         if ($this->isRequest($entry, $method)) {
-            return Str::startsWith($entry->content['uri'] ?? '', '/login') || (Str::startsWith($entry->content['uri'] ?? '', '/2fa/') && Str::endsWith($entry->content['uri'] ?? '', '/login'));
+            return Str::startsWith($entry->content['uri'], '/login') || (Str::startsWith($entry->content['uri'], '/2fa/') && Str::endsWith($entry->content['uri'], '/login'));
         }
 
         return false;

@@ -37,7 +37,7 @@ readonly class CountryService
      */
     public function getCountryNativeNameByCode(string $code): string
     {
-        $native = $this->getCountryByCode($code)?->getNative();
+        $native = $this->getCountryByCode($code)->getNative();
 
         throw_if(!$native, CountryNativeNameNotFoundException::class, 'Country native name not found');
 
@@ -66,11 +66,11 @@ readonly class CountryService
 
     public function getCurrencyByLangCode(
         string $languageCode,
-    ) {
-        /** @var CountryEntity $countryEntity */
+    ): ?string {
+        /** @var CountryEntity|null $countryEntity */
         $countryEntity = $this->getCountriesByLanguageCode($languageCode)->toCollection()->first();
 
-        if (!$countryEntity) {
+        if ($countryEntity === null) {
             return null;
         }
 
