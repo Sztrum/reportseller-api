@@ -18,4 +18,12 @@ class ReportStatusRepository extends EloquentModelRepository
     {
         return 'report-status';
     }
+
+    public function firstBySlug(
+        string $slug
+    ): ?ReportStatus {
+        return $this->query()
+            ->where('slug', $slug)
+            ->first();
+    }
 }
