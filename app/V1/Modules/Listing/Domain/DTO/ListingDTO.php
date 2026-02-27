@@ -14,6 +14,7 @@ final class ListingDTO extends Data
         public string $report_category_slug,
         public ?string $external_id,
         public ?string $title,
+        public ?string $description,
         public ?int $price,
         public ?string $currency,
         public ?string $seller_type,

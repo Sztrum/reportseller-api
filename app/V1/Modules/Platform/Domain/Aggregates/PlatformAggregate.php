@@ -2,18 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\V1\Modules\ReportCatalog\Report\Domain\Aggregates;
+namespace App\V1\Modules\Platform\Domain\Aggregates;
 
 use App\V1\Modules\Platform\Domain\Exceptions\PlatformNotFoundException;
 use App\V1\Modules\Platform\Domain\Models\Platform;
 use Throwable;
 
-readonly class ReportAggregate
+readonly class PlatformAggregate
 {
-    public function __construct(
-    ) {
-    }
-
     /**
      * @throws PlatformNotFoundException|Throwable
      */

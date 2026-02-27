@@ -19,6 +19,7 @@ class ReportStoreRequest extends BaseRequest
 
             'listing.external_id' => ['nullable', 'string', 'max:191'],
             'listing.title' => ['nullable', 'string', 'max:191'],
+            'listing.description' => ['nullable', 'string', 'max:5000'],
             'listing.price' => ['nullable', 'integer', 'min:0', 'max:999999999999'],
             'listing.currency' => ['nullable', 'string', 'size:3'],
             'listing.seller_type' => ['nullable', 'in:private,business'],
@@ -28,7 +29,7 @@ class ReportStoreRequest extends BaseRequest
             'listing.is_active_external' => ['nullable', 'boolean'],
 
             'report' => ['required', 'array'],
-            'report.title' => ['required', 'string', 'min:5 ', 'max:255'],
+            'report.title' => ['required', 'string', 'min:5', 'max:255'],
             'report.description' => ['required', 'string', 'min:10', 'max:5000'],
 
             'author' => ['nullable', 'array'],
