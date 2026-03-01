@@ -15,6 +15,7 @@ use App\V1\Core\Application\Providers\Extenders\ViteHmrServiceProvider;
 use App\V1\Core\Application\Providers\ModuleServiceProvider;
 use App\V1\Core\Infrastructure\Packages\Sanctum\Providers\SanctumServiceProvider;
 use App\V1\Core\Infrastructure\Packages\Telescope\Providers\TelescopeServiceProvider;
+use Laravel\Telescope\TelescopeServiceProvider as LaravelTelescopeServiceProvider;
 
 class CoreModuleServiceProvider extends ModuleServiceProvider
 {
@@ -30,6 +31,7 @@ class CoreModuleServiceProvider extends ModuleServiceProvider
         parent::register();
 
         $this->app->register(CoreServiceProvider::class);
+        $this->app->register(LaravelTelescopeServiceProvider::class);
         $this->app->register(TelescopeServiceProvider::class);
         $this->app->register(CoreConfigServiceProvider::class);
         $this->app->register(CoreMigrationStubsServiceProvider::class);
@@ -39,6 +41,5 @@ class CoreModuleServiceProvider extends ModuleServiceProvider
         $this->app->register(CoreRouteServiceProvider::class);
         $this->app->register(ViteHmrServiceProvider::class);
         $this->app->register(SanctumServiceProvider::class);
-        $this->app->register(TelescopeServiceProvider::class);
     }
 }

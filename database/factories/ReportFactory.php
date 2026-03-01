@@ -7,8 +7,12 @@ namespace Database\Factories;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Report>
+ */
 final class ReportFactory extends Factory
 {
+    /** @var class-string<Report> */
     protected $model = Report::class;
 
     public function definition(): array

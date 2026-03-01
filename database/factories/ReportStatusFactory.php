@@ -8,8 +8,12 @@ use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/**
+ * @extends Factory<ReportStatus>
+ */
 class ReportStatusFactory extends Factory
 {
+    /** @var class-string<ReportStatus> */
     protected $model = ReportStatus::class;
 
     public function definition(): array

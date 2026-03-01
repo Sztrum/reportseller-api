@@ -22,16 +22,16 @@ class SendEmailJob implements ShouldQueue
 
     use SerializesModels;
 
-    public $deleteWhenMissingModels = true;
+    public bool $deleteWhenMissingModels = true;
 
-    public $tries = 3;
+    public int $tries = 3;
 
     /**
      * Create a new job instance.
      */
     public function __construct(
-        private Mailable $mailable,
-        private string $email
+        private readonly Mailable $mailable,
+        private readonly string   $email
     ) {
         //
     }

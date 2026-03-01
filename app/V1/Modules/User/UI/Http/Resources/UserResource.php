@@ -28,10 +28,6 @@ class UserResource extends ApiResponseResource
 
     public function getRelationships(): array
     {
-        return $this->getRelationshipsNames()->mapWithKeys(fn (string $relationship) => [
-            $relationship => match ($relationship) {
-                default => null,
-            },
-        ])->toArray();
+        return [];
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Support\ServiceProvider;
 
 class CoreMigrationStubsServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
     }
 
@@ -18,10 +18,13 @@ class CoreMigrationStubsServiceProvider extends ServiceProvider
     {
         $this->app->extend(
             'migration.creator',
-            fn (MigrationCreator $migrationCreator, Application $app) => new MigrationCreator(
-                $migrationCreator->getFilesystem(),
-                $app['config']->get('core::migration.stub_path')
-            )
+            function (MigrationCreator $migrationCreator, Application $app): MigrationCreator {
+                $stubPath = $app['config']->get('core::migration.stub_path');
+                return new MigrationCreator(
+                    $migrationCreator->getFilesystem(),
+                    is_string($stubPath) ? $stubPath : database_path('migrations')
+                );
+            }
         );
     }
 }

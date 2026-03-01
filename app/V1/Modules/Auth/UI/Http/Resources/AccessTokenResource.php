@@ -21,6 +21,9 @@ class AccessTokenResource extends JsonResource
         parent::__construct($resource);
     }
 
+    /**
+     * @return array<string, int|string>
+     */
     public function toArray($request): array
     {
         return [

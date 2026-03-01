@@ -14,14 +14,20 @@ class ApiForgotPasswordRequest extends FormRequest
         return $authManager->guard()->user() === null;
     }
 
+    /**
+     * @return array<string, list<string>>
+     */
     public function rules(): array
     {
-        return [
+        /** @var array<string, list<string>> $rules */
+        $rules = [
             'email' => [
                 'string',
                 'required',
                 'email:rfc,dns',
             ],
         ];
+
+        return $rules;
     }
 }

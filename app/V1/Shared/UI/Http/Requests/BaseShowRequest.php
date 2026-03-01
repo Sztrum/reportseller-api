@@ -10,6 +10,9 @@ abstract class BaseShowRequest extends FormRequest
 {
     protected $stopOnFirstFailure = true;
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [

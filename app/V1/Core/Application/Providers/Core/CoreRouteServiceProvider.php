@@ -24,7 +24,8 @@ class CoreRouteServiceProvider extends ApiRouteServiceProvider
     protected function configureRateLimiting(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            $maxAttempts = (int) config('auth.throttle.default', 500);
+            $maxAttemptsConfig = config('auth.throttle.default', 500);
+            $maxAttempts = is_numeric($maxAttemptsConfig) ? (int) $maxAttemptsConfig : 500;
             $user = $request->user();
 
             return Limit::perMinute($maxAttempts)->by($user?->id ?: $request->ip());

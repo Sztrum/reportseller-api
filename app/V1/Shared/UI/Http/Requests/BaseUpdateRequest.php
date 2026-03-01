@@ -12,6 +12,9 @@ abstract class BaseUpdateRequest extends FormRequest
 {
     protected $stopOnFirstFailure = true;
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [
@@ -21,21 +24,21 @@ abstract class BaseUpdateRequest extends FormRequest
 
     public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
-            $fields = $this->input('fields', []);
+        $validator->after(function (Validator $validator): void {
+            $fields = $this->normalizeArrayInput($this->input('fields', []));
 
             // Sprawdź, czy pole "name" jest wypełnione w co najmniej jednym języku
             $nameFilled = false;
             $errorKey = '';
             foreach ($fields as $lang => $fieldData) {
-                if (!empty($fieldData['name'])) {
+                if (is_array($fieldData) && !empty($fieldData['name'])) {
                     $nameFilled = true;
 
                     break;
                 }
 
                 if ($errorKey === '') {
-                    $errorKey = 'fields.' . $lang . '.name';
+                    $errorKey = 'fields.' . (string) $lang . '.name';
                 }
             }
 
@@ -45,6 +48,9 @@ abstract class BaseUpdateRequest extends FormRequest
         });
     }
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     protected function getContentSectionsRules(): array
     {
         return [
@@ -72,5 +78,14 @@ abstract class BaseUpdateRequest extends FormRequest
         throw (new ValidationException($validator))
             ->errorBag($this->errorBag)
             ->redirectTo($this->getRedirectUrl());
+    }
+
+    /**
+     * @param mixed $value
+     * @return array<int|string, mixed>
+     */
+    private function normalizeArrayInput(mixed $value): array
+    {
+        return is_array($value) ? $value : [];
     }
 }

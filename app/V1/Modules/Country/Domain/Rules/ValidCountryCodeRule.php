@@ -10,10 +10,18 @@ use Throwable;
 
 class ValidCountryCodeRule implements Rule
 {
+    /**
+     * @param mixed $attribute
+     * @param mixed $value
+     */
     public function passes($attribute, $value): bool
     {
         /** @var CountryService $countryService */
         $countryService = resolve(CountryService::class);
+
+        if (!is_string($value) || $value === '') {
+            return false;
+        }
 
         try {
             $countryService->getCountryByCode($value);

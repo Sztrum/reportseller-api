@@ -15,9 +15,13 @@ class ApiResetPasswordRequest extends FormRequest
         return $authManager->guard()->user() == null;
     }
 
+    /**
+     * @return array<string, list<string|IsValidPasswordRule>>
+     */
     public function rules(): array
     {
-        return [
+        /** @var array<string, list<string|IsValidPasswordRule>> $rules */
+        $rules = [
             'token' => [
                 'required',
                 'string',
@@ -29,5 +33,7 @@ class ApiResetPasswordRequest extends FormRequest
                 new IsValidPasswordRule(),
             ],
         ];
+
+        return $rules;
     }
 }

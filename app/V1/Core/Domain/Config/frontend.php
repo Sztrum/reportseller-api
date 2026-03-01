@@ -3,5 +3,5 @@
 declare(strict_types=1);
 
 return [
-    'url' => config('app.frontend_app_url', 'http://gorodo.test'),
+    'url' => env('FRONTEND_APP_URL', 'http://reportseller.test'),
 ];

@@ -7,6 +7,7 @@ namespace App\V1\Core\Application\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\View\Factory as ViewFactory;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -26,9 +27,13 @@ abstract class ViewServiceProvider extends ServiceProvider
     private function loadViews(): void
     {
         $reflectionClass = new ReflectionClass($this);
+        $providerFile = $reflectionClass->getFileName();
+        if (!is_string($providerFile)) {
+            return;
+        }
 
         $viewsPath = implode(DIRECTORY_SEPARATOR, [
-            dirname($reflectionClass->getFileName()),
+            dirname($providerFile),
             static::VIEWS_PATH,
         ]);
 
@@ -40,9 +45,13 @@ abstract class ViewServiceProvider extends ServiceProvider
     protected function registerBladeComponents(): void
     {
         $reflectionClass = new ReflectionClass($this);
+        $providerFile = $reflectionClass->getFileName();
+        if (!is_string($providerFile)) {
+            return;
+        }
 
         $path = implode(DIRECTORY_SEPARATOR, [
-            dirname($reflectionClass->getFileName()),
+            dirname($providerFile),
             static::VIEWS_PATH,
         ]);
 
@@ -50,7 +59,9 @@ abstract class ViewServiceProvider extends ServiceProvider
             return;
         }
 
-        $this->app['view']->addNamespace($this->moduleName(), $path);
+        /** @var ViewFactory $viewFactory */
+        $viewFactory = $this->app->make('view');
+        $viewFactory->addNamespace($this->moduleName(), $path);
 
         if (is_dir($path . '/components')) {
             $finder = new Finder();
@@ -59,7 +70,6 @@ abstract class ViewServiceProvider extends ServiceProvider
             foreach ($components as $component) {
                 $tag = $this->getComponentTag($component);
                 $componentPath = $this->moduleName() . '::components.' . $tag;
-
                 Blade::component($componentPath, $this->moduleName() . '::' . $tag);
             }
         }

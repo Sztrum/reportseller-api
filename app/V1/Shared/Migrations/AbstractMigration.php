@@ -20,8 +20,21 @@ abstract class AbstractMigration extends Migration
             ->getSchemaBuilder()
             ->getForeignKeys($table);
 
-        return collect($foreignKeys)
-            ->flatMap(static fn (array $foreignKey): array => $foreignKey['columns'] ?? [])
-            ->contains($column);
+        foreach ($foreignKeys as $foreignKey) {
+            if (!is_array($foreignKey)) {
+                continue;
+            }
+
+            $columns = $foreignKey['columns'] ?? [];
+            if (!is_array($columns)) {
+                continue;
+            }
+
+            if (in_array($column, $columns, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class ApiResponseResource extends JsonResource
 {
+    /**
+     * @param mixed $resource
+     * @param array<string, mixed> $additionalData
+     */
     public function __construct(
         $resource,
         protected ?string $relationships = null,
@@ -19,35 +23,60 @@ abstract class ApiResponseResource extends JsonResource
         parent::__construct($resource);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     abstract public function getResourceData(): array;
 
+    /**
+     * @return array<string, mixed>
+     */
     abstract public function getRelationships(): array;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray($request): array
     {
         if ($this->asResponse) {
             return [
                 'status' => Response::HTTP_OK,
-                'data' => $this->getAllResourceData() + $this->additionalData
+                'data' => $this->getAllResourceData() + $this->additionalData,
             ];
         }
 
         return $this->getAllResourceData();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getAllResourceData(): array
     {
-        return (isset($this->resource->id) ? [
-            'id' => $this->resource->id,
-        ] : []) + $this->getResourceData() + $this->getRelationships();
+        $id = data_get($this->resource, 'id');
+        $idData = (is_int($id) || is_string($id)) ? ['id' => $id] : [];
+
+        return $idData + $this->getResourceData() + $this->getRelationships();
     }
 
+    /**
+     * @return Collection<int, string>
+     */
     protected function getRelationshipsNames(): Collection
     {
         if ($this->relationships === '' || $this->relationships === null) {
-            return collect();
+            /** @var Collection<int, string> $empty */
+            $empty = collect();
+
+            return $empty;
         }
 
-        return collect(explode(',', trim($this->relationships)));
+        /** @var Collection<int, string> $relationships */
+        $relationships = collect(explode(',', trim($this->relationships)))
+            ->map(static fn (string $relationship): string => trim($relationship))
+            ->filter(static fn (string $relationship): bool => $relationship !== '')
+            ->values();
+
+        return $relationships;
     }
 }

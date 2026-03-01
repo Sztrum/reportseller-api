@@ -8,6 +8,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Laravel\Sanctum\NewAccessToken;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @property NewAccessToken $resource
+ */
 class LoginDataResource extends JsonResource
 {
     /** @var string|null */
@@ -18,6 +21,9 @@ class LoginDataResource extends JsonResource
         parent::__construct($token);
     }
 
+    /**
+     * @return array<string, int|string|array<string, string>>
+     */
     public function toArray($request): array
     {
         return [

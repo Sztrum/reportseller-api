@@ -9,6 +9,9 @@ use App\V1\Modules\Country\Domain\Services\CountryService;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Throwable;
 
+/**
+ * @implements CastsAttributes<CountryEntity|null, string|null>
+ */
 readonly class CountryEntityCast implements CastsAttributes
 {
     /**
@@ -21,13 +24,18 @@ readonly class CountryEntityCast implements CastsAttributes
         /** @var CountryService $countryService */
         $countryService = resolve(CountryService::class);
 
-        if (!$value) {
+        if (!is_string($value) || $value === '') {
             return null;
         }
 
         return $countryService->getCountryByCode($value);
     }
 
+    /**
+     * @param mixed $model
+     * @param mixed $value
+     * @param array<string, mixed> $attributes
+     */
     public function set($model, string $key, $value, array $attributes)
     {
         return $value instanceof CountryEntity ? $value->getCode() : $value;

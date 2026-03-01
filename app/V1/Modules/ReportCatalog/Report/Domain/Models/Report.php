@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\V1\Modules\ReportCatalog\Report\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
+use Database\Factories\ReportFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Report extends Model
 {
+    /** @use HasFactory<ReportFactory> */
     use SoftDeletes, HasFactory;
 
     protected $fillable = [

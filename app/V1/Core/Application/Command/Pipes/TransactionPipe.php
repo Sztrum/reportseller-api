@@ -15,11 +15,12 @@ class TransactionPipe
     }
 
     /**
-     * @param  mixed     $job
-     * @param  mixed     $next
+     * @param mixed $job
+     * @param callable(mixed): mixed $next
      * @throws Throwable
+     * @return mixed
      */
-    public function handle($job, $next)
+    public function handle(mixed $job, callable $next): mixed
     {
         return $this->connectionResolver->connection()
             ->transaction(fn () => $next($job));

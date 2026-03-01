@@ -26,9 +26,4 @@ abstract class CommandBusServiceProvider extends BaseServiceProvider
 
         $this->registerCommands($commandBus);
     }
-
-    protected function registerCommands(CommandBusInterface $commandBus): void
-    {
-        //
-    }
 }

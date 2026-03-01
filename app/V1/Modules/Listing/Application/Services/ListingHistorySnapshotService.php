@@ -18,10 +18,15 @@ readonly class ListingHistorySnapshotService
     ) {
     }
 
+    /**
+     * @return array<string, mixed>|null
+     * @throws \Throwable
+     */
     public function getSnapshotIfChanged(
         string $listingId,
         ListingDTO $listingDTO,
     ): ?array {
+        /** @var array<string, mixed> $snapshot */
         $snapshot = [
             'listing_id' => $listingId,
             'external_id' => $listingDTO->external_id,
@@ -49,6 +54,9 @@ readonly class ListingHistorySnapshotService
         }
     }
 
+    /**
+     * @param array<string, mixed> $snapshot
+     */
     private function hasSnapshotChanges(
         ?ListingHistory $lastSnapshot,
         array $snapshot,

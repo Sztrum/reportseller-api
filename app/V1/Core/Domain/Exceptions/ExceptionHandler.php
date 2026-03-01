@@ -42,26 +42,28 @@ class ExceptionHandler extends Handler
 
     private function buildJsonResponse(Throwable $e, bool $isDebug = false): JsonResponse
     {
-        $exceptionMap = $this->getExceptionMap($isDebug);
+        if ($e instanceof ThrottleRequestsException) {
+            return $this->respond(['status' => Response::HTTP_TOO_MANY_REQUESTS, 'message' => __('core::validation.throttle')], $e, $isDebug);
+        }
 
-        foreach ($exceptionMap as $exceptionClass => $response) {
-            if (!is_a($e, $exceptionClass, true)) {
-                continue;
-            }
+        if ($e instanceof ValidationException) {
+            return $this->respond([
+                'status' => $e->status,
+                'message' => __('core::validation.invalid_data'),
+                'errors' => $e->errors(),
+            ], $e, $isDebug);
+        }
 
-            /** @var array<string, mixed> $responseData */
-            $responseData = is_callable($response) ? $response($e) : $response;
+        if ($e instanceof ModelNotFoundException || $e instanceof NotFoundHttpException) {
+            return $this->respond(['status' => Response::HTTP_NOT_FOUND, 'message' => __('core::domain.model_not_found')], $e, $isDebug);
+        }
 
-            if ($isDebug) {
-                $responseData['data'] = $this->getDebugData($e);
-            }
+        if ($e instanceof HttpException) {
+            return $this->respond(['status' => $e->getStatusCode(), 'message' => $e->getMessage()], $e, $isDebug);
+        }
 
-            return new JsonResponse(
-                $responseData,
-                $responseData['status'] ?? Response::HTTP_INTERNAL_SERVER_ERROR,
-                [],
-                JSON_UNESCAPED_UNICODE
-            );
+        if ($e instanceof AuthenticationException) {
+            return $this->respond(['status' => Response::HTTP_UNAUTHORIZED, 'message' => __('core::domain.unauthenticated')], $e, $isDebug);
         }
 
         return $this->buildDefaultResponse($e, $isDebug);
@@ -69,8 +71,10 @@ class ExceptionHandler extends Handler
 
     private function buildDefaultResponse(Throwable $e, bool $isDebug): JsonResponse
     {
+        $status = $this->resolveHttpStatusCode($e);
+
         $responseData = [
-            'status' => $e->getCode() ?: Response::HTTP_INTERNAL_SERVER_ERROR,
+            'status' => $status,
             'message' => $e->getMessage(),
         ];
 
@@ -78,7 +82,7 @@ class ExceptionHandler extends Handler
             $responseData['data'] = $this->getDebugData($e);
         }
 
-        return new JsonResponse($responseData, $responseData['status'], [], JSON_UNESCAPED_UNICODE);
+        return new JsonResponse($responseData, $status, [], JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -95,36 +99,29 @@ class ExceptionHandler extends Handler
     }
 
     /**
-     * @return array<class-string<Throwable>, array<string, mixed>|callable(Throwable): array<string, mixed>>
+     * @param array<string, mixed> $responseData
      */
-    private function getExceptionMap(bool $isDebug): array
+    private function respond(array $responseData, Throwable $e, bool $isDebug): JsonResponse
     {
-        return [
-            ThrottleRequestsException::class => [
-                'status' => Response::HTTP_TOO_MANY_REQUESTS,
-                'message' => __('core::validation.throttle'),
-            ],
-            ValidationException::class => fn ($e) => [
-                'status' => $e->status,
-                'message' => __('core::validation.invalid_data'),
-                'errors' => $e->errors(),
-            ],
-            ModelNotFoundException::class => [
-                'status' => Response::HTTP_NOT_FOUND,
-                'message' => __('core::domain.model_not_found'),
-            ],
-            NotFoundHttpException::class => [
-                'status' => Response::HTTP_NOT_FOUND,
-                'message' => __('core::domain.model_not_found'),
-            ],
-            HttpException::class => fn ($e) => [
-                'status' => $e->getStatusCode(),
-                'message' => $e->getMessage(),
-            ],
-            AuthenticationException::class => [
-                'status' => Response::HTTP_UNAUTHORIZED,
-                'message' => __('core::domain.unauthenticated'),
-            ],
-        ];
+        if ($isDebug) {
+            $responseData['data'] = $this->getDebugData($e);
+        }
+
+        $status = isset($responseData['status']) && is_int($responseData['status'])
+            ? $responseData['status']
+            : Response::HTTP_INTERNAL_SERVER_ERROR;
+
+        return new JsonResponse($responseData, $status, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    private function resolveHttpStatusCode(Throwable $e): int
+    {
+        $code = $e->getCode();
+
+        if (is_int($code) && $code >= 100 && $code <= 599) {
+            return $code;
+        }
+
+        return Response::HTTP_INTERNAL_SERVER_ERROR;
     }
 }

@@ -6,13 +6,19 @@ namespace App\V1\Core\UI\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ForceJsonResponse
 {
-    public function handle(Request $request, Closure $next)
+    /**
+     * @param Closure(Request): Response $next
+     */
+    public function handle(Request $request, Closure $next): Response
     {
         $request->headers->set('Accept', 'application/json');
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+        return $response;
     }
 }

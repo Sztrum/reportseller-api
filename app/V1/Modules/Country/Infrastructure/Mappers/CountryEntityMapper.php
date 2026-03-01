@@ -8,17 +8,11 @@ use App\V1\Modules\Country\Domain\Entities\CountryEntity;
 
 class CountryEntityMapper
 {
+    /**
+     * @param array<string, mixed> $country
+     */
     public function parseToEntity(array $country): CountryEntity
     {
-        return new CountryEntity(
-            code: $country['code'],
-            name: $country['name'],
-            native: $country['native'],
-            phone: $country['phone'],
-            continent: $country['continent'],
-            capital: $country['capital'],
-            currency: $country['currency'],
-            languages: $country['languages'],
-        );
+        return CountryEntity::fromArray($country);
     }
 }

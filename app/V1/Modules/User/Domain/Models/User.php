@@ -7,6 +7,7 @@ namespace App\V1\Modules\User\Domain\Models;
 use App\V1\Core\Domain\Models\Model;
 use App\V1\Core\Infrastructure\Packages\Sanctum\Models\PersonalAccessToken;
 use App\V1\Modules\User\Domain\Events\UserHasBeenCreatedEvent;
+use Database\Factories\UserFactory;
 use DateTimeInterface;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\MustVerifyEmail;
@@ -56,6 +57,7 @@ class User extends Model implements
     CanResetPasswordContract
 {
     use HasApiTokens;
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use Notifiable;
     use Authorizable;
@@ -83,21 +85,30 @@ class User extends Model implements
         'created' => UserHasBeenCreatedEvent::class,
     ];
 
+    /**
+     * @param array<int, string> $abilities
+     */
     public function createToken(
         string $name,
         array $abilities = ['*'],
-        DateTimeInterface $expiresAt = null
+        ?DateTimeInterface $expiresAt = null
     ): NewAccessToken {
+        $plainTextToken = Str::random(40);
         /** @var PersonalAccessToken $token */
         $token = $this->tokens()
             ->create([
                 'name' => $name,
-                'token' => hash('sha256', $plainTextToken = Str::random(40)),
+                'token' => hash('sha256', $plainTextToken),
                 'abilities' => $abilities,
                 'expires_at' => $expiresAt,
             ]);
 
-        $plainToken = $token->getKey() . '|' . $plainTextToken;
+        $tokenKey = $token->getKey();
+        if (!is_string($tokenKey) && !is_int($tokenKey)) {
+            $tokenKey = $token->id;
+        }
+
+        $plainToken = $tokenKey . '|' . $plainTextToken;
 
         return new NewAccessToken($token, encrypt($plainToken));
     }

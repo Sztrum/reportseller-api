@@ -8,6 +8,9 @@ use App\V1\Shared\UI\Http\Requests\BaseRequest;
 
 class ReportStoreRequest extends BaseRequest
 {
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [
@@ -47,6 +50,13 @@ class ReportStoreRequest extends BaseRequest
 
     public function messages(): array
     {
-        return trans('report::validation.custom');
+        $messages = trans('report::validation.custom');
+
+        if (!is_array($messages)) {
+            return [];
+        }
+
+        /** @var array<string, string> $messages */
+        return $messages;
     }
 }

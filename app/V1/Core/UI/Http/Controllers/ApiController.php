@@ -39,6 +39,9 @@ class ApiController extends BaseController
         ], $statusCode);
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     protected function responseData(
         array $data,
         string $message = null,

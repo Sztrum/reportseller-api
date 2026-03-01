@@ -32,8 +32,12 @@ abstract class ApiRouteServiceProvider extends RouteServiceProvider
     {
         $routeProviderReflection = new ReflectionClass($this);
 
-        return Collection::make($this->app->getProviders(ModuleServiceProvider::class))
-            ->filter(function (ModuleServiceProvider $moduleServiceProvider) use ($routeProviderReflection) {
+        $provider = Collection::make($this->app->getProviders(ModuleServiceProvider::class))
+            ->filter(function ($moduleServiceProvider) use ($routeProviderReflection): bool {
+                if (!$moduleServiceProvider instanceof ModuleServiceProvider) {
+                    return false;
+                }
+
                 $routeProviderNamespace = $routeProviderReflection->getNamespaceName();
                 $moduleProviderNamespace = (new ReflectionClass($moduleServiceProvider))->getNamespaceName();
 
@@ -48,6 +52,12 @@ abstract class ApiRouteServiceProvider extends RouteServiceProvider
 
                 return true;
             })->first();
+
+        if (!$provider instanceof ModuleServiceProvider) {
+            throw new \RuntimeException('Cannot resolve module provider for api routes.');
+        }
+
+        return $provider;
     }
 
     public static function getRoutePrefix(): string
@@ -79,8 +89,8 @@ abstract class ApiRouteServiceProvider extends RouteServiceProvider
     public function getPrefix(): string
     {
         return $this->hasPrefix()
-            ? sprintf(static::PREFIX_PATTERN, static::getRoutePrefix(), $this->getModulePrefix())
-            : sprintf(static::PATTERN, static::getRoutePrefix());
+            ? static::getRoutePrefix() . '/' . $this->getModulePrefix()
+            : static::getRoutePrefix();
     }
 
     public function map(Registrar $router): void
@@ -94,6 +104,9 @@ abstract class ApiRouteServiceProvider extends RouteServiceProvider
 
     abstract protected function registerRoutes(Registrar $router): void;
 
+    /**
+     * @return list<string>
+     */
     protected function middlewares(): array
     {
         return ['api'];

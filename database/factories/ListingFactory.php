@@ -8,8 +8,12 @@ use App\V1\Modules\Listing\Domain\Models\Listing;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/**
+ * @extends Factory<Listing>
+ */
 final class ListingFactory extends Factory
 {
+    /** @var class-string<Listing> */
     protected $model = Listing::class;
 
     public function definition(): array

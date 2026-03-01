@@ -42,7 +42,7 @@ class AuthController extends ApiController
 
     public function login(
         ApiLoginRequest $request,
-    ) {
+    ): JsonResponse {
         $token = $this->authService->login(
             loginDataDTO: LoginDataDTO::from($request)
         );
@@ -58,10 +58,9 @@ class AuthController extends ApiController
         /** @var User $user */
         $user = $request->user();
 
-        /** @var PersonalAccessToken $accessToken */
+        /** @var PersonalAccessToken|null $accessToken */
         $accessToken = $user->currentAccessToken();
-
-        $accessToken->delete();
+        $accessToken?->delete();
 
         return $this->responseFactory->json([
             'status' => Response::HTTP_OK,
@@ -72,10 +71,15 @@ class AuthController extends ApiController
     public function register(
         ApiRegisterUserRequest $request
     ): JsonResponse {
+        $nameValue = $request->validated('name');
+        $emailValue = $request->validated('email');
+        $name = is_string($nameValue) ? $nameValue : '';
+        $email = is_string($emailValue) ? $emailValue : '';
+
         $this->commandBus->dispatch(
             new RegisterUserCommand(
-                name: $request->validated('name'),
-                email: $request->validated('email'),
+                name: $name,
+                email: $email,
             )
         );
 
@@ -112,11 +116,14 @@ class AuthController extends ApiController
         string                   $user_id,
         string                   $remember_token,
     ): JsonResponse {
+        $passwordValue = $request->input('password');
+        $password = is_string($passwordValue) ? $passwordValue : '';
+
         $this->commandBus->dispatch(
             new SetNewPasswordCommand(
                 user_id: $user_id,
                 remember_token: $remember_token,
-                password: $request->input('password')
+                password: $password
             ),
         );
 
@@ -129,10 +136,13 @@ class AuthController extends ApiController
     public function forgotPassword(
         ApiForgotPasswordRequest $request,
     ): JsonResponse {
+        $emailValue = $request->get('email');
+        $email = is_string($emailValue) ? $emailValue : '';
+
         try {
             $this->commandBus->dispatch(
                 new ForgotPasswordCommand(
-                    $request->get('email')
+                    $email
                 )
             );
         } catch (Throwable $e) {
@@ -149,11 +159,16 @@ class AuthController extends ApiController
         ApiResetPasswordRequest $request,
         string $remember_token,
     ): JsonResponse {
+        $tokenValue = $request->get('token');
+        $passwordValue = $request->input('password');
+        $token = is_string($tokenValue) ? $tokenValue : '';
+        $password = is_string($passwordValue) ? $passwordValue : '';
+
         $this->commandBus->dispatch(
             new ResetPasswordCommand(
                 remember_token: $remember_token,
-                token: $request->get('token'),
-                password: $request->input('password'),
+                token: $token,
+                password: $password,
             )
         );
 

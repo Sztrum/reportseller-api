@@ -52,10 +52,12 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         /** @var Platform|null $platform */
         $platform = $this->platformRepository->fistBySlug($command->listingDTO->platform_slug);
         $this->platformAggregate->ensurePlatformExists($platform);
+        assert($platform instanceof Platform);
 
         /** @var ReportCategory|null $category */
         $category = $this->reportCategoryRepository->firstBySlug($command->listingDTO->report_category_slug);
         $this->reportCategoryAggregate->ensureReportCategoryExists($category);
+        assert($category instanceof ReportCategory);
 
         /** @var Listing|null $listing */
         $listing = null;
@@ -71,9 +73,10 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         }
 
         if ($listing === null) {
-            $listing = $this->listingRepository->create([
-                "platform_id" => $platform->id,
-                "report_category_id" => $category->id,
+            /** @var array<string, mixed> $listingPayload */
+            $listingPayload = [
+                'platform_id' => $platform->id,
+                'report_category_id' => $category->id,
                 'external_id' => $command->listingDTO->external_id,
                 'url' => $command->listingDTO->url,
                 'title' => $command->listingDTO->title,
@@ -85,16 +88,22 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
                 'location' => $command->listingDTO->location,
                 'thumbnail_url' => $command->listingDTO->thumbnail_url,
                 'is_active_external' => $command->listingDTO->is_active_external,
+            ];
+
+            $listing = $this->listingRepository->create([
+                ...$listingPayload,
             ]);
         }
 
         $snapshot = $this->listingHistorySnapshotService->getSnapshotIfChanged($listing->id, $command->listingDTO);
         if ($snapshot !== null) {
+            /** @var array<string, mixed> $snapshot */
             $this->listingHistoryRepository->create($snapshot);
         }
 
         /** @var ReportStatus|null $reportStatus */
         $reportStatus = $this->reportStatusRepository->firstBySlug('new');
+        assert($reportStatus instanceof ReportStatus);
 
         /** @var ReportAuthor $author */
         $author = $this->reportAuthorRepository->create([

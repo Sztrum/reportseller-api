@@ -33,14 +33,6 @@ class CountryEntityResource extends ApiResponseResource
 
     public function getRelationships(): array
     {
-        return $this->getRelationshipsNames()->mapWithKeys(fn (string $relationship) => [
-            $relationship => match ($relationship) {
-                //                'complaint_products' => new CollectionComplaintProductResource(
-                //                    $this->getResource()->complaintProducts,
-                //                    'names,configurations'
-                //                ),
-                default => null,
-            },
-        ])->toArray();
+        return [];
     }
 }

@@ -16,11 +16,17 @@ abstract class EloquentModelRepository implements ModelRepositoryInterface
     abstract public function model(): Model;
     abstract public function moduleName(): string;
 
+    /**
+     * @return Builder<Model>
+     */
     protected function query(): Builder
     {
         return $this->model()->query();
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function create(array $params): Model
     {
         /** @var Model $model */
@@ -29,6 +35,9 @@ abstract class EloquentModelRepository implements ModelRepositoryInterface
         return $model;
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function update(Model $model, array $params): Model
     {
         $model->fill($params)->save();
@@ -61,6 +70,9 @@ abstract class EloquentModelRepository implements ModelRepositoryInterface
         return $model;
     }
 
+    /**
+     * @return Collection<int, Model>
+     */
     public function all(): Collection
     {
         return $this->query()->get();

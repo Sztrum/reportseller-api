@@ -12,6 +12,9 @@ abstract class BaseStoreRequest extends FormRequest
 {
     protected $stopOnFirstFailure = true;
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     public function rules(): array
     {
         return [
@@ -21,22 +24,22 @@ abstract class BaseStoreRequest extends FormRequest
 
     public function withValidator(Validator $validator): void
     {
-        $validator->after(function ($validator) {
-            $fields = $this->input('fields', []);
-            $name = $this->input('name', []);
+        $validator->after(function (Validator $validator): void {
+            $fields = $this->normalizeArrayInput($this->input('fields', []));
+            $name = $this->normalizeArrayInput($this->input('name', []));
 
             $nameFilled = false;
             $errorKey = '';
 
             foreach ($fields as $lang => $fieldData) {
-                if (!empty($fieldData['name'])) {
+                if (is_array($fieldData) && !empty($fieldData['name'])) {
                     $nameFilled = true;
 
                     break;
                 }
 
                 if ($errorKey === '') {
-                    $errorKey = 'fields.' . $lang . '.name';
+                    $errorKey = 'fields.' . (string) $lang . '.name';
                 }
             }
 
@@ -49,7 +52,7 @@ abstract class BaseStoreRequest extends FormRequest
                     }
 
                     if ($errorKey === '') {
-                        $errorKey = 'name.' . $lang;
+                        $errorKey = 'name.' . (string) $lang;
                     }
                 }
             }
@@ -61,6 +64,9 @@ abstract class BaseStoreRequest extends FormRequest
     }
 
 
+    /**
+     * @return array<string, array<int, string>>
+     */
     protected function getContentSectionsRules(): array
     {
         return [
@@ -86,5 +92,14 @@ abstract class BaseStoreRequest extends FormRequest
         throw (new ValidationException($validator))
             ->errorBag($this->errorBag)
             ->redirectTo($this->getRedirectUrl());
+    }
+
+    /**
+     * @param mixed $value
+     * @return array<int|string, mixed>
+     */
+    private function normalizeArrayInput(mixed $value): array
+    {
+        return is_array($value) ? $value : [];
     }
 }
