@@ -22,8 +22,11 @@ class PlatformRepository extends EloquentModelRepository
     public function fistBySlug(
         string $slug
     ): ?Platform {
-        return $this->query()
+        /** @var Platform|null $platform */
+        $platform = $this->query()
             ->where('slug', $slug)
             ->first();
+
+        return $platform;
     }
 }

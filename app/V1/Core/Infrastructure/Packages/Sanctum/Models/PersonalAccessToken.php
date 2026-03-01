@@ -17,7 +17,7 @@ use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
  * @property string                                                    $tokenable_id
  * @property string                                                    $name
  * @property string                                                    $token
- * @property array|null                                                $abilities
+ * @property array<int, string>|null                                  $abilities
  * @property \Illuminate\Support\Carbon|null                           $last_used_at
  * @property \Illuminate\Support\Carbon|null                           $expires_at
  * @property \Illuminate\Support\Carbon|null                           $created_at
@@ -51,20 +51,32 @@ class PersonalAccessToken extends SanctumPersonalAccessToken
         'expires_at' => 'datetime',
     ];
 
+    /**
+     * @param mixed $token
+     */
     public static function findToken($token): ?self
     {
+        if (!is_string($token) || $token === '') {
+            return null;
+        }
+
         try {
-            return parent::findToken(decrypt($token));
+            $decryptedToken = decrypt($token);
+            if (!is_string($decryptedToken) || $decryptedToken === '') {
+                return null;
+            }
+
+            return parent::findToken($decryptedToken);
         } catch (DecryptException) {
             return parent::findToken($token);
         }
     }
 
-    protected static function boot()
+    protected static function boot(): void
     {
         parent::boot();
 
-        static::creating(function ($model) {
+        static::creating(function (self $model): void {
             $model->{$model->getKeyName()} = (string) Str::uuid();
         });
     }

@@ -8,9 +8,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ApiRegisterUserRequest extends FormRequest
 {
+    /**
+     * @return array<string, list<string>>
+     */
     public function rules(): array
     {
-        return [
+        /** @var array<string, list<string>> $rules */
+        $rules = [
             'name' => [
                 'string',
                 'required',
@@ -22,5 +26,7 @@ class ApiRegisterUserRequest extends FormRequest
                 'unique:users'
             ],
         ];
+
+        return $rules;
     }
 }

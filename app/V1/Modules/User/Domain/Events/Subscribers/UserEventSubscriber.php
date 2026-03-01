@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\V1\Modules\User\Domain\Events\Subscribers;
 
 use App\V1\Modules\User\Domain\Events\Listeners\SendEmailConfirmationListener;
+use App\V1\Modules\User\Domain\Events\ResendEmailConfirmationEvent;
 use App\V1\Modules\User\Domain\Events\UserHasBeenCreatedEvent;
 use Illuminate\Contracts\Events\Dispatcher;
 

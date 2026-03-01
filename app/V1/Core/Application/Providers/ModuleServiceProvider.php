@@ -12,6 +12,7 @@ abstract class ModuleServiceProvider extends ServiceProvider
     protected const TRANSLATIONS_PATH = 'Application/Translations';
     public const TRANSLATIONS_MODULE_SEPARATOR = '::';
 
+    /** @var array<int, array{name: string, path: string}> */
     private static array $registeredModules = [];
 
     abstract public function moduleName(): string;
@@ -45,9 +46,13 @@ abstract class ModuleServiceProvider extends ServiceProvider
     private function loadTranslations(): void
     {
         $reflectionClass = new ReflectionClass($this);
+        $providerFile = $reflectionClass->getFileName();
+        if (!is_string($providerFile)) {
+            return;
+        }
 
         $translationsPath = join(DIRECTORY_SEPARATOR, [
-            dirname($reflectionClass->getFileName()),
+            dirname($providerFile),
             static::TRANSLATIONS_PATH,
         ]);
 
@@ -60,6 +65,11 @@ abstract class ModuleServiceProvider extends ServiceProvider
     {
         $reflectionClass = new ReflectionClass($this);
 
-        return dirname($reflectionClass->getFileName());
+        $providerFile = $reflectionClass->getFileName();
+        if (!is_string($providerFile)) {
+            throw new \RuntimeException('Cannot resolve module provider path.');
+        }
+
+        return dirname($providerFile);
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ReportCategory extends Model
 {
+    /** @use HasFactory<ReportCategoryFactory> */
     use HasFactory;
 
     protected $fillable = [

@@ -9,9 +9,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ApiSetNewPasswordRequest extends FormRequest
 {
+    /**
+     * @return array<string, list<string|IsValidPasswordRule>>
+     */
     public function rules(): array
     {
-        return [
+        /** @var array<string, list<string|IsValidPasswordRule>> $rules */
+        $rules = [
             'password' => [
                 'required',
                 'string',
@@ -19,5 +23,7 @@ class ApiSetNewPasswordRequest extends FormRequest
                 new IsValidPasswordRule(),
             ],
         ];
+
+        return $rules;
     }
 }

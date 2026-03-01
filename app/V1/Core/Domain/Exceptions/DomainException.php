@@ -9,6 +9,10 @@ use Throwable;
 
 class DomainException extends HttpException
 {
+    /**
+     * @param array<string, scalar> $replace
+     * @param array<string, string> $headers
+     */
     public function __construct(
         ?string $message = null,
         array $replace = [],
@@ -16,6 +20,12 @@ class DomainException extends HttpException
         array $headers = [],
         int $code = 0,
     ) {
-        parent::__construct($message ?? '', Response::HTTP_UNPROCESSABLE_ENTITY, $previous, $headers, $code);
+        parent::__construct(
+            message: $message ? __($message, $replace) : '',
+            statusCode: Response::HTTP_UNPROCESSABLE_ENTITY,
+            previous: $previous,
+            headers: $headers,
+            code: $code
+        );
     }
 }

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\V1\Modules\Listing\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
+use Database\Factories\ListingHistoryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ListingHistory extends Model
 {
+    /** @use HasFactory<ListingHistoryFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -28,7 +30,7 @@ class ListingHistory extends Model
     ];
 
     protected $casts = [
-        'price' => 'float',
+        'price' => 'integer',
         'is_active_external' => 'bool',
         'captured_at' => 'datetime',
     ];

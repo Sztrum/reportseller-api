@@ -49,7 +49,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     public function isWebsocketRequest(IncomingEntry $entry): bool
     {
         if ($this->isRequest($entry, 'POST')) {
-            return Str::startsWith($entry->content['uri'] ?? '', '/broadcasting');
+            return Str::startsWith($this->entryUri($entry), '/broadcasting');
         }
 
         return false;
@@ -57,7 +57,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
     public function isApiRequest(IncomingEntry $entry): bool
     {
-        return Str::startsWith($entry->content['uri'] ?? '', '/api');
+        return Str::startsWith($this->entryUri($entry), '/api');
     }
 
     public function isEvent(IncomingEntry $entry, string $eventClass = null): bool
@@ -75,12 +75,14 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
     public function isSuccessRequest(IncomingEntry $entry): bool
     {
-        return $entry->type === EntryType::REQUEST && ($entry->content['response_status'] ?? 0) === 200;
+        return $entry->type === EntryType::REQUEST && $this->entryResponseStatus($entry) === 200;
     }
 
     public function isFailedRequest(IncomingEntry $entry): bool
     {
-        return $entry->type === EntryType::REQUEST && ($entry->content['response_status'] ?? 200) >= 500 && ($entry->content['response_status'] ?? 200) !== 503;
+        $responseStatus = $this->entryResponseStatus($entry);
+
+        return $entry->type === EntryType::REQUEST && $responseStatus >= 500 && $responseStatus !== 503;
     }
 
     public function isFailedJob(IncomingEntry $entry): bool
@@ -151,7 +153,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     public function isLivewireRequest(IncomingEntry $entry, string $method = 'POST'): bool
     {
         if ($this->isRequest($entry, $method)) {
-            return Str::startsWith($entry->content['uri'] ?? '', '/livewire/');
+            return Str::startsWith($this->entryUri($entry), '/livewire/');
         }
 
         return false;
@@ -165,7 +167,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     public function isLoginRequest(IncomingEntry $entry, string $method = 'POST'): bool
     {
         if ($this->isRequest($entry, $method)) {
-            return Str::startsWith($entry->content['uri'] ?? '', '/login') || (Str::startsWith($entry->content['uri'] ?? '', '/2fa/') && Str::endsWith($entry->content['uri'] ?? '', '/login'));
+            $uri = $this->entryUri($entry);
+
+            return Str::startsWith($uri, '/login') || (Str::startsWith($uri, '/2fa/') && Str::endsWith($uri, '/login'));
         }
 
         return false;
@@ -174,7 +178,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     public function isLogoutRequest(IncomingEntry $entry, string $method = 'POST'): bool
     {
         if ($this->isRequest($entry, $method)) {
-            return Str::startsWith($entry->content['uri'] ?? '', '/logout');
+            return Str::startsWith($this->entryUri($entry), '/logout');
         }
 
         return false;
@@ -205,8 +209,28 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewTelescope', static function ($user) {
-            return $user->role_id === 2 || $user->role_id === 1;
+        Gate::define('viewTelescope', static function (mixed $user): bool {
+            if (!is_object($user)) {
+                return false;
+            }
+
+            $roleId = data_get($user, 'role_id');
+
+            return $roleId === 1 || $roleId === 2;
         });
+    }
+
+    private function entryUri(IncomingEntry $entry): string
+    {
+        $uri = $entry->content['uri'] ?? null;
+
+        return is_string($uri) ? $uri : '';
+    }
+
+    private function entryResponseStatus(IncomingEntry $entry): int
+    {
+        $responseStatus = $entry->content['response_status'] ?? null;
+
+        return is_int($responseStatus) ? $responseStatus : 0;
     }
 }

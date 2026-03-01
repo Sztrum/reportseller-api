@@ -12,10 +12,11 @@ use Intervention\Image\ImageManager;
 
 if (!function_exists('enum_rand')) {
     /**
-     * @param  mixed               $enum
+     * @param class-string $enum
      * @throws ReflectionException
+     * @return mixed
      */
-    function enum_rand($enum)
+    function enum_rand(string $enum): mixed
     {
         $constants = (new ReflectionClass($enum))->getConstants();
 
@@ -25,7 +26,7 @@ if (!function_exists('enum_rand')) {
 
 if (!function_exists('recurrent_extract_key_from_object')) {
     /**
-     * @param  mixed               $result
+     * @param array<int, mixed> $result
      * @throws ReflectionException
      */
     function recurrent_extract_key_from_object(stdClass $data, string $search, string $childrenKey, &$result): void
@@ -35,14 +36,23 @@ if (!function_exists('recurrent_extract_key_from_object')) {
         }
 
         if (property_exists($data, $childrenKey)) {
-            foreach ($data->{$childrenKey} as $child) {
-                recurrent_extract_key_from_object($child, $search, $childrenKey, $result);
+            $children = $data->{$childrenKey};
+            if (is_iterable($children)) {
+                foreach ($children as $child) {
+                    if ($child instanceof stdClass) {
+                        recurrent_extract_key_from_object($child, $search, $childrenKey, $result);
+                    }
+                }
             }
         }
     }
 }
 
 if (!function_exists('remove_key_with_special_value')) {
+    /**
+     * @param array<array-key, mixed> $array
+     * @return array<array-key, mixed>
+     */
     function remove_key_with_special_value(array $array, string $specialValueToRemove): array
     {
         foreach ($array as $key => $item) {
@@ -67,6 +77,9 @@ if (!function_exists('remove_key_with_special_value')) {
 }
 
 if (!function_exists('array_has_numeric_keys')) {
+    /**
+     * @param array<array-key, mixed> $array
+     */
     function array_has_numeric_keys(array $array): bool
     {
         foreach ($array as $key => $value) {
@@ -80,6 +93,11 @@ if (!function_exists('array_has_numeric_keys')) {
 }
 
 if (!function_exists('add_element_to_array_by_wire_key')) {
+    /**
+     * @param array<array-key, mixed> $array
+     * @param list<string|int> $chain
+     * @return array<array-key, mixed>
+     */
     function add_element_to_array_by_wire_key(
         array $array,
         array $chain,
@@ -88,11 +106,14 @@ if (!function_exists('add_element_to_array_by_wire_key')) {
         $target = &$array;
 
         for ($build_key = 0; $build_key < count($chain); $build_key++) { //Laravel collections ->each method not working here
-            if (!isset($target[$chain[$build_key]])) {
-                $target[$chain[$build_key]] = [];
+            $key = $chain[$build_key];
+            if (!isset($target[$key]) || !is_array($target[$key])) {
+                $target[$key] = [];
             }
 
-            $target = &$target[$chain[$build_key]];
+            /** @var array<array-key, mixed> $nextTarget */
+            $nextTarget = &$target[$key];
+            $target = &$nextTarget;
         }
 
         $target[] = $newElement;
@@ -102,6 +123,11 @@ if (!function_exists('add_element_to_array_by_wire_key')) {
 }
 
 if (!function_exists('remove_element_from_array_by_wire_key')) {
+    /**
+     * @param array<array-key, mixed> $array
+     * @param list<string|int> $chain
+     * @return array<array-key, mixed>
+     */
     function remove_element_from_array_by_wire_key(
         array $array,
         array $chain,
@@ -111,18 +137,23 @@ if (!function_exists('remove_element_from_array_by_wire_key')) {
         $beforeLast = null;
 
         for ($build_key = 0; $build_key < count($chain); $build_key++) { //Laravel collections ->each method not working here
-            if (!isset($target[$chain[$build_key]])) {
-                $target[$chain[$build_key]] = [];
+            $key = $chain[$build_key];
+            if (!isset($target[$key]) || !is_array($target[$key])) {
+                $target[$key] = [];
             }
 
             if ($build_key == count($chain) - 1) {
                 $beforeLast = &$target;
             }
 
-            $target = &$target[$chain[$build_key]];
+            /** @var array<array-key, mixed> $nextTarget */
+            $nextTarget = &$target[$key];
+            $target = &$nextTarget;
         }
 
-        $beforeLast = array_values($beforeLast);
+        if (is_array($beforeLast)) {
+            $beforeLast = array_values($beforeLast);
+        }
 
         $target = 'special_value_to_remove'; //temporally fix is setting "special" value and later removing key by this value
 
@@ -137,7 +168,7 @@ if (!function_exists('convert_name_to_wire_key')) {
     function convert_name_to_wire_key(
         string $name
     ): string {
-        $output = preg_replace('/\[(.*?)\]/', '.$1', $name);
+        $output = preg_replace('/\[(.*?)\]/', '.$1', $name) ?? $name;
 
         if ($output[0] === '.') {
             $output = substr($output, 1);
@@ -163,7 +194,6 @@ if (!function_exists('get_remote_file_info')) {
 
                     // Determine the appropriate DTO based on the content type
                     if (str_starts_with($contentType, 'image/')) {
-                        // Process image files
                         $imageManager = new ImageManager(new Driver());
                         $image = $imageManager->read($content);
 
@@ -192,10 +222,14 @@ if (!function_exists('get_remote_file_info')) {
 }
 
 if (!function_exists('json_decode_recurrency')) {
+    /**
+     * @param array<array-key, mixed> $array
+     * @return array<array-key, mixed>
+     */
     function json_decode_recurrency(array $array): array
     {
         foreach ($array as $key => &$item) {
-            if (is_json($item)) {
+            if (is_string($item) && is_json($item)) {
                 $item = json_decode($item, true);
             }
 
@@ -208,15 +242,26 @@ if (!function_exists('json_decode_recurrency')) {
     }
 }
 
+if (!function_exists('is_json')) {
+    function is_json(mixed $value): bool
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        return json_validate($value);
+    }
+}
+
 if (!function_exists('merge_arrays_recursively')) {
     /**
      * Merges two arrays recursively. Values from the second array will overwrite values in the first array if they exist.
      * If the values are arrays themselves, the function will recursively merge those arrays.
      *
-     * @param array $base_array       the base array to which values will be merged
-     * @param array $additional_array the array whose values will be merged into the base array
+     * @param array<array-key, mixed> $base_array the base array to which values will be merged
+     * @param array<array-key, mixed> $additional_array the array whose values will be merged into the base array
      *
-     * @return array the merged array
+     * @return array<array-key, mixed> the merged array
      */
     function merge_arrays_recursively(array $base_array, array $additional_array): array
     {

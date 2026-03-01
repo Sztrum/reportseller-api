@@ -10,13 +10,20 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use Traversable;
 
+/**
+ * @implements IteratorAggregate<string, CountryEntity>
+ */
 class CountryEntityCollection implements IteratorAggregate, Countable
 {
+    /** @var array<string, CountryEntity> */
     private array $items;
 
     public function __construct(CountryEntity ...$items)
     {
-        $this->items = $items;
+        $this->items = [];
+        foreach ($items as $item) {
+            $this->items[$item->getCode()] = $item;
+        }
     }
 
     public function add(CountryEntity $country): self
@@ -28,7 +35,10 @@ class CountryEntityCollection implements IteratorAggregate, Countable
 
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->items);
+        /** @var Traversable<string, CountryEntity> $iterator */
+        $iterator = new ArrayIterator($this->items);
+
+        return $iterator;
     }
 
     public function count(): int
@@ -41,11 +51,17 @@ class CountryEntityCollection implements IteratorAggregate, Countable
         return $this->items[$code];
     }
 
+    /**
+     * @return array<string, CountryEntity>
+     */
     public function toArray(): array
     {
         return $this->items;
     }
 
+    /**
+     * @return Collection<string, CountryEntity>
+     */
     public function toCollection(): Collection
     {
         return new Collection($this->items);

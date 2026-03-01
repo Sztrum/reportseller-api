@@ -25,11 +25,11 @@ readonly class CountryService
      */
     public function getCountryByCode(string $code): CountryEntity
     {
-        $config = $this->config->get('countries::countries.countries.' . strtoupper($code));
+        $countryConfig = $this->config->get('countries::countries.countries.' . strtoupper($code));
 
-        throw_if(!$config, CountryNotFoundException::class, 'Country not found');
+        throw_if(!is_array($countryConfig), CountryNotFoundException::class, 'Country not found');
 
-        return $this->countryEntityMapper->parseToEntity($config + ['code' => $code]);
+        return $this->countryEntityMapper->parseToEntity($this->normalizeCountryData($countryConfig, $code));
     }
 
     /**
@@ -37,7 +37,7 @@ readonly class CountryService
      */
     public function getCountryNativeNameByCode(string $code): string
     {
-        $native = $this->getCountryByCode($code)?->getNative();
+        $native = $this->getCountryByCode($code)->getNative();
 
         throw_if(!$native, CountryNativeNameNotFoundException::class, 'Country native name not found');
 
@@ -51,44 +51,92 @@ readonly class CountryService
     {
         $countries = new CountryEntityCollection();
 
-        collect($this->config->get('countries::countries.countries'))->each(function ($country, $code) use (&$countries, $languageCode) {
-            $country = $this->countryEntityMapper->parseToEntity($country + [
-                'code' => mb_strtolower($code, 'UTF-8'),
-            ]);
+        foreach ($this->getCountriesConfig() as $code => $countryData) {
+            $country = $this->countryEntityMapper->parseToEntity($this->normalizeCountryData($countryData, mb_strtolower($code, 'UTF-8')));
 
             if ($country->hasLanguage($languageCode)) {
                 $countries->add($country);
             }
-        });
+        }
 
         return $countries;
     }
 
     public function getCurrencyByLangCode(
         string $languageCode,
-    ) {
-        /** @var CountryEntity $countryEntity */
+    ): ?string {
+        /** @var CountryEntity|null $countryEntity */
         $countryEntity = $this->getCountriesByLanguageCode($languageCode)->toCollection()->first();
 
-        if (!$countryEntity) {
+        if ($countryEntity === null) {
             return null;
         }
 
-        return $countryEntity->getCurrency()[0] ?? null;
+        $currency = $countryEntity->getCurrency()[0] ?? null;
+
+        return is_string($currency) ? $currency : null;
     }
 
     public function getAllCountries(): CountryEntityCollection
     {
         $countries = new CountryEntityCollection();
 
-        collect($this->config->get('countries::countries.countries'))->each(function ($country, $code) use (&$countries) {
-            $country = $this->countryEntityMapper->parseToEntity($country + [
-                'code' => mb_strtolower($code, 'UTF-8'),
-            ]);
-
+        foreach ($this->getCountriesConfig() as $code => $countryData) {
+            $country = $this->countryEntityMapper->parseToEntity($this->normalizeCountryData($countryData, mb_strtolower($code, 'UTF-8')));
             $countries->add($country);
-        });
+        }
 
         return $countries;
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function getCountriesConfig(): array
+    {
+        $countries = $this->config->get('countries::countries.countries');
+
+        if (!is_array($countries)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($countries as $code => $countryData) {
+            if (!is_string($code) || !is_array($countryData)) {
+                continue;
+            }
+
+            /** @var array<string, mixed> $normalizedCountryData */
+            $normalizedCountryData = [];
+            foreach ($countryData as $key => $value) {
+                if (!is_string($key)) {
+                    continue;
+                }
+
+                $normalizedCountryData[$key] = $value;
+            }
+
+            $result[$code] = $normalizedCountryData;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<mixed, mixed> $countryData
+     * @return array<string, mixed>
+     */
+    private function normalizeCountryData(array $countryData, string $countryCode): array
+    {
+        $normalized = ['code' => $countryCode];
+        foreach ($countryData as $key => $value) {
+            if (!is_string($key)) {
+                continue;
+            }
+
+            $normalized[$key] = $value;
+        }
+
+        return $normalized;
     }
 }

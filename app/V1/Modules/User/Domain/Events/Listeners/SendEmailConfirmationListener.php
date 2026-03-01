@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\V1\Modules\User\Domain\Events\Listeners;
 
 use App\V1\Modules\Email\Domain\Services\EmailService;
+use App\V1\Modules\User\Domain\Events\ResendEmailConfirmationEvent;
 use App\V1\Modules\User\Domain\Events\UserHasBeenCreatedEvent;
 use App\V1\Modules\User\Domain\Mail\VerifyEmailMail;
 

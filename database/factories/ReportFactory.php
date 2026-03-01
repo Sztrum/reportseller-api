@@ -7,8 +7,12 @@ namespace Database\Factories;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Report>
+ */
 final class ReportFactory extends Factory
 {
+    /** @var class-string<Report> */
     protected $model = Report::class;
 
     public function definition(): array
@@ -17,6 +21,7 @@ final class ReportFactory extends Factory
             'listing_id' => $this->faker->uuid(),
             'report_status_id' => $this->faker->uuid(),
             'report_author_id' => $this->faker->uuid(),
+            'title' => $this->faker->sentence(6),
             'description' => $this->faker->paragraphs(2, true),
             'moderation_note' => null,
             'is_published' => false,

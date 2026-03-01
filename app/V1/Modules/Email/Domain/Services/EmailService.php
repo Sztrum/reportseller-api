@@ -14,6 +14,9 @@ readonly class EmailService
     ) {
     }
 
+    /**
+     * @param array<int, string> $recipients
+     */
     public function sendEmail(
         array $recipients,
         Mailable $mailable,

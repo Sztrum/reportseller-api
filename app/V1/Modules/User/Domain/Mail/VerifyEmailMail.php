@@ -20,8 +20,16 @@ class VerifyEmailMail extends Mailable
     ) {
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function build(FrontendEndpointService $frontendEndpointService): VerifyEmailMail
     {
+        $userId = $this->user->getKey();
+        if (!is_string($userId) && !is_int($userId)) {
+            $userId = $this->user->id;
+        }
+
         return $this->subject(
             __('user::emails.verify-email.subject')
         )
@@ -29,7 +37,7 @@ class VerifyEmailMail extends Mailable
             ->with([
                 'user' => $this->user,
                 'frontendUrl' => $frontendEndpointService->route(FrontEndRouteEnum::AUTH_VERIFY_EMAIL, [
-                    'user_id' => $this->user->getKey(),
+                    'user_id' => $userId,
                     'hash' => $this->user->generateHashToEmailVerification(),
                 ]),
             ]);

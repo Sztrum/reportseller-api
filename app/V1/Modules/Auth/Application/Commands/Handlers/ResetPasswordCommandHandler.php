@@ -39,15 +39,20 @@ readonly class ResetPasswordCommandHandler implements CommandHandlerInterface
                 'password' => $command->password,
                 'token' => $command->token,
             ],
-            fn (User $user, $password) => $this->commandBus->dispatch(
-                new SetNewPasswordCommand(
-                    $user->id,
-                    $user->getRememberToken(),
-                    $password
-                )
-            )
+            function (User $user, $password): void {
+                $rememberToken = $user->getRememberToken();
+                $passwordValue = is_string($password) ? $password : '';
+
+                $this->commandBus->dispatch(
+                    new SetNewPasswordCommand(
+                        $user->id,
+                        is_string($rememberToken) ? $rememberToken : '',
+                        $passwordValue
+                    )
+                );
+            }
         );
 
-        $this->userAggregate->verifyResetPasswordStatus($status);
+        $this->userAggregate->verifyResetPasswordStatus(is_string($status) ? $status : '');
     }
 }

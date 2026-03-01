@@ -25,6 +25,7 @@ return new class extends AbstractCreateTableMigration
                 ->constrained('report_authors')
                 ->restrictOnDelete();
 
+            $table->string('title')->nullable();
             $table->text('description');
             $table->text('moderation_note')->nullable();
             $table->boolean('is_published')->default(false);

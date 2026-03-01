@@ -10,6 +10,9 @@ use Throwable;
 
 class HttpException extends SymfonyHttpException
 {
+    /**
+     * @param array<string, scalar|array<array-key, mixed>> $headers
+     */
     public function __construct(
         string $message = '',
         public int $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR,
@@ -18,5 +21,13 @@ class HttpException extends SymfonyHttpException
         int $code = 0
     ) {
         parent::__construct($statusCode, $message, $previous, $headers, $code);
+    }
+
+    /**
+     * @param array<string, scalar> $replace
+     */
+    protected static function resolveDefaultMessage(string $key, array $replace = []): string
+    {
+        return __($key, $replace);
     }
 }

@@ -26,8 +26,12 @@ abstract class FrontendRouteServiceProvider extends RouteServiceProvider
     {
         $routeProviderReflection = new ReflectionClass($this);
 
-        return Collection::make($this->app->getProviders(ModuleServiceProvider::class))
-            ->filter(function (ModuleServiceProvider $moduleServiceProvider) use ($routeProviderReflection) {
+        $provider = Collection::make($this->app->getProviders(ModuleServiceProvider::class))
+            ->filter(function ($moduleServiceProvider) use ($routeProviderReflection): bool {
+                if (!$moduleServiceProvider instanceof ModuleServiceProvider) {
+                    return false;
+                }
+
                 $routeProviderNamespace = $routeProviderReflection->getNamespaceName();
                 $moduleProviderNamespace = (new ReflectionClass($moduleServiceProvider))->getNamespaceName();
 
@@ -42,6 +46,12 @@ abstract class FrontendRouteServiceProvider extends RouteServiceProvider
 
                 return true;
             })->first();
+
+        if (!$provider instanceof ModuleServiceProvider) {
+            throw new \RuntimeException('Cannot resolve module provider for frontend routes.');
+        }
+
+        return $provider;
     }
 
     public function getModulePrefix(): string
@@ -73,6 +83,9 @@ abstract class FrontendRouteServiceProvider extends RouteServiceProvider
 
     abstract protected function registerRoutes(Registrar $router): void;
 
+    /**
+     * @return list<string>
+     */
     protected function middlewares(): array
     {
         return ['web'];

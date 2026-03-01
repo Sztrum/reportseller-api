@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\V1\Modules\ReportCatalog\ReportAuthors\Domain\Models\ReportAuthor;
+use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\Models\ReportAuthor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<ReportAuthor>
+ */
 final class ReportAuthorFactory extends Factory
 {
+    /** @var class-string<ReportAuthor> */
     protected $model = ReportAuthor::class;
 
     public function definition(): array

@@ -8,9 +8,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ApiLoginRequest extends FormRequest
 {
+    /**
+     * @return array<string, list<string>>
+     */
     public function rules(): array
     {
-        return [
+        /** @var array<string, list<string>> $rules */
+        $rules = [
             'email' => [
                 'required',
                 'email:rfc,dns',
@@ -19,5 +23,7 @@ class ApiLoginRequest extends FormRequest
                 'required',
             ],
         ];
+
+        return $rules;
     }
 }

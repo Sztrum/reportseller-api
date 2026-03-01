@@ -8,9 +8,18 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use JsonException;
 use JsonSerializable;
+use Throwable;
 
+/**
+ * @implements Arrayable<string, mixed>
+ */
 readonly class CountryEntity implements Arrayable, JsonSerializable, Jsonable
 {
+    /**
+     * @param array<int, string> $phone
+     * @param array<int, string> $currency
+     * @param array<int, string> $languages
+     */
     public function __construct(
         private string $code,
         private string $name,
@@ -38,6 +47,9 @@ readonly class CountryEntity implements Arrayable, JsonSerializable, Jsonable
         return $this->native;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getPhone(): array
     {
         return $this->phone;
@@ -53,11 +65,17 @@ readonly class CountryEntity implements Arrayable, JsonSerializable, Jsonable
         return $this->capital;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getCurrency(): array
     {
         return $this->currency;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getLanguages(): array
     {
         return $this->languages;
@@ -68,6 +86,9 @@ readonly class CountryEntity implements Arrayable, JsonSerializable, Jsonable
         return in_array($code, $this->languages, true);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [
@@ -87,34 +108,69 @@ readonly class CountryEntity implements Arrayable, JsonSerializable, Jsonable
         return $this->toJson();
     }
 
+    /**
+     * @param array<string, mixed> $data
+     * @throws Throwable
+     */
     public static function fromArray(array $data): self
     {
         return new self(
-            code: $data['code'],
-            name: $data['name'],
-            native: $data['native'],
-            phone: $data['phone'],
-            continent: $data['continent'],
-            capital: $data['capital'],
-            currency: $data['currency'],
-            languages: $data['languages'],
+            code: self::stringValue($data, 'code'),
+            name: self::stringValue($data, 'name'),
+            native: self::stringValue($data, 'native'),
+            phone: self::stringListValue($data, 'phone'),
+            continent: self::stringValue($data, 'continent'),
+            capital: self::stringValue($data, 'capital'),
+            currency: self::stringListValue($data, 'currency'),
+            languages: self::stringListValue($data, 'languages'),
         );
     }
 
     /**
-     * @throws JsonException
+     * @return array<string, mixed>
      */
-    public function jsonSerialize(): string|bool
+    public function jsonSerialize(): array
     {
-        return json_encode($this->toArray(), JSON_THROW_ON_ERROR);
+        return $this->toArray();
     }
 
     /**
-     * @param  mixed         $options
+     * @param mixed $options
      * @throws JsonException
      */
-    public function toJson($options = 0): bool|string
+    public function toJson($options = 0): string
     {
+        if (!is_int($options)) {
+            $options = 0;
+        }
+
         return json_encode($this->toArray(), JSON_THROW_ON_ERROR | $options);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @throws Throwable
+     */
+    private static function stringValue(array $data, string $key): string
+    {
+        $value = $data[$key] ?? null;
+        throw_if(!is_string($value), new \InvalidArgumentException(sprintf('Invalid "%s" country value.', $key)));
+
+        return $value;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<int, string>
+     *
+     * @throws Throwable
+     */
+    private static function stringListValue(array $data, string $key): array
+    {
+        $value = $data[$key] ?? null;
+        throw_if(!is_array($value), new \InvalidArgumentException(sprintf('Invalid "%s" country value.', $key)));
+
+        return array_values(array_filter($value, static fn (mixed $item): bool => is_string($item)));
     }
 }

@@ -13,13 +13,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AccessTokenResource extends JsonResource
 {
-    public static $wrap = false;
+    /** @var string|null */
+    public static $wrap = null;
 
     public function __construct(NewAccessToken $resource)
     {
         parent::__construct($resource);
     }
 
+    /**
+     * @return array<string, int|string>
+     */
     public function toArray($request): array
     {
         return [

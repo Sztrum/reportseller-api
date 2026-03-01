@@ -6,9 +6,8 @@ namespace App\V1\Modules\User\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use App\V1\Core\Infrastructure\Packages\Sanctum\Models\PersonalAccessToken;
-use App\V1\Modules\Company\Domain\Models\Company;
-use App\V1\Modules\Company\Domain\Models\CompanyInvitation;
 use App\V1\Modules\User\Domain\Events\UserHasBeenCreatedEvent;
+use Database\Factories\UserFactory;
 use DateTimeInterface;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\MustVerifyEmail;
@@ -35,8 +34,6 @@ use Laravel\Sanctum\NewAccessToken;
  * @property string|null                                                                                                   $remember_token
  * @property \Illuminate\Support\Carbon|null                                                                               $created_at
  * @property \Illuminate\Support\Carbon|null                                                                               $updated_at
- * @property \Illuminate\Database\Eloquent\Collection<int, Company>                                                        $companies
- * @property int|null                                                                                                      $companies_count
  * @property \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property int|null                                                                                                      $notifications_count
  * @property \Illuminate\Database\Eloquent\Collection<int, PersonalAccessToken>                                            $tokens
@@ -52,10 +49,6 @@ use Laravel\Sanctum\NewAccessToken;
  * @method static \Illuminate\Database\Eloquent\Builder|User                                                                    wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User                                                                    whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User                                                                    whereUpdatedAt($value)
- * @property \Illuminate\Database\Eloquent\Collection<int, CompanyInvitation>                                              $receivedCompanyInvitations
- * @property int|null                                                                                                      $received_company_invitations_count
- * @property \Illuminate\Database\Eloquent\Collection<int, CompanyInvitation>                                              $sentCompanyInvitations
- * @property int|null                                                                                                      $sent_company_invitations_count
  * @mixin \Eloquent
  */
 class User extends Model implements
@@ -64,6 +57,7 @@ class User extends Model implements
     CanResetPasswordContract
 {
     use HasApiTokens;
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use Notifiable;
     use Authorizable;
@@ -91,21 +85,30 @@ class User extends Model implements
         'created' => UserHasBeenCreatedEvent::class,
     ];
 
+    /**
+     * @param array<int, string> $abilities
+     */
     public function createToken(
         string $name,
         array $abilities = ['*'],
-        DateTimeInterface $expiresAt = null
+        ?DateTimeInterface $expiresAt = null
     ): NewAccessToken {
+        $plainTextToken = Str::random(40);
         /** @var PersonalAccessToken $token */
         $token = $this->tokens()
             ->create([
                 'name' => $name,
-                'token' => hash('sha256', $plainTextToken = Str::random(40)),
+                'token' => hash('sha256', $plainTextToken),
                 'abilities' => $abilities,
                 'expires_at' => $expiresAt,
             ]);
 
-        $plainToken = $token->getKey() . '|' . $plainTextToken;
+        $tokenKey = $token->getKey();
+        if (!is_string($tokenKey) && !is_int($tokenKey)) {
+            $tokenKey = $token->id;
+        }
+
+        $plainToken = $tokenKey . '|' . $plainTextToken;
 
         return new NewAccessToken($token, encrypt($plainToken));
     }

@@ -35,8 +35,8 @@ Read documents in this exact order before implementation:
   - `app/V1/Modules/Email/**`
   - `app/V1/Modules/ReportCatalog/**`
     - `Report`
-    - `ReportAuthors`
-    - `ReportAttachments`
+    - `ReportAuthor`
+    - `ReportAttachment`
     - `ReportCategory`
     - `ReportStatus`
 

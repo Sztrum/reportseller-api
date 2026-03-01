@@ -22,11 +22,13 @@ readonly class FrontendEndpointService
      */
     public function getUrl(): UrlVO
     {
-        return new UrlVO($this->config->get('core::frontend.url'));
+        $url = $this->config->get('core::frontend.url');
+        return new UrlVO(is_string($url) ? $url : 'http://localhost');
     }
 
     /**
      * @throws Throwable
+     * @param array<string, scalar|Model|null> $data
      */
     public function route(
         FrontEndRouteEnum $route,
@@ -39,6 +41,9 @@ readonly class FrontendEndpointService
         ]);
     }
 
+    /**
+     * @param array<string, scalar|Model|null> $data
+     */
     private function prepareRoute(
         FrontEndRouteEnum $route,
         array $data,
@@ -50,11 +55,11 @@ readonly class FrontendEndpointService
         foreach ($data as $paramName => $paramValue) {
             $pattern = "{{$paramName}}";
             if (strpos($url, $pattern) !== false) {
+                $routeKey = $paramValue instanceof Model ? $paramValue->getRouteKey() : $paramValue;
+                $value = is_scalar($routeKey) || $routeKey === null ? (string) $routeKey : '';
                 $url = str_replace(
                     $pattern,
-                    $paramValue instanceof Model
-                        ? $paramValue->getRouteKey()
-                        : (string) $paramValue,
+                    $value,
                     $url
                 );
                 //                unset($data[$paramName]);

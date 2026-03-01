@@ -21,15 +21,13 @@ class UserResource extends ApiResponseResource
     public function getResource(): User
     {
         /** @var User $resource */
-        return $this->resource;
+        $resource = $this->resource;
+
+        return $resource;
     }
 
     public function getRelationships(): array
     {
-        return $this->getRelationshipsNames()->mapWithKeys(fn (string $relationship) => [
-            $relationship => match ($relationship) {
-                default => null,
-            },
-        ])->toArray();
+        return [];
     }
 }

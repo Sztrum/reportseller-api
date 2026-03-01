@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Platform extends Model
 {
+    /** @use HasFactory<PlatformFactory> */
     use HasFactory;
 
     protected $fillable = [

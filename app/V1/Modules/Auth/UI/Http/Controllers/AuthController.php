@@ -22,28 +22,27 @@ use App\V1\Modules\Auth\UI\Http\Requests\ApiSetNewPasswordRequest;
 use App\V1\Modules\Auth\UI\Http\Requests\ApiVerifyEmailRequest;
 use App\V1\Modules\User\Application\Commands\RegisterUserCommand;
 use App\V1\Modules\User\Domain\Models\User;
-use App\V1\Modules\User\Infrastructure\Repositories\UserRepository;
 use App\V1\Modules\User\UI\Http\Resources\UserResource;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 class AuthController extends ApiController
 {
     public function __construct(
         CommandBusInterface $commandBus,
         ResponseFactory $responseFactory,
-        private readonly AuthService       $authService,
-        private readonly UserRepository    $userRepository,
+        private readonly AuthService $authService,
     ) {
         parent::__construct($commandBus, $responseFactory);
     }
 
     public function login(
         ApiLoginRequest $request,
-    ) {
+    ): JsonResponse {
         $token = $this->authService->login(
             loginDataDTO: LoginDataDTO::from($request)
         );
@@ -59,9 +58,8 @@ class AuthController extends ApiController
         /** @var User $user */
         $user = $request->user();
 
-        /** @var PersonalAccessToken $accessToken */
-        $accessToken = $user?->currentAccessToken();
-
+        /** @var PersonalAccessToken|null $accessToken */
+        $accessToken = $user->currentAccessToken();
         $accessToken?->delete();
 
         return $this->responseFactory->json([
@@ -73,10 +71,15 @@ class AuthController extends ApiController
     public function register(
         ApiRegisterUserRequest $request
     ): JsonResponse {
+        $nameValue = $request->validated('name');
+        $emailValue = $request->validated('email');
+        $name = is_string($nameValue) ? $nameValue : '';
+        $email = is_string($emailValue) ? $emailValue : '';
+
         $this->commandBus->dispatch(
             new RegisterUserCommand(
-                name: $request->validated('name'),
-                email: $request->validated('email'),
+                name: $name,
+                email: $email,
             )
         );
 
@@ -113,11 +116,14 @@ class AuthController extends ApiController
         string                   $user_id,
         string                   $remember_token,
     ): JsonResponse {
+        $passwordValue = $request->input('password');
+        $password = is_string($passwordValue) ? $passwordValue : '';
+
         $this->commandBus->dispatch(
             new SetNewPasswordCommand(
                 user_id: $user_id,
                 remember_token: $remember_token,
-                password: $request->input('password')
+                password: $password
             ),
         );
 
@@ -130,10 +136,13 @@ class AuthController extends ApiController
     public function forgotPassword(
         ApiForgotPasswordRequest $request,
     ): JsonResponse {
+        $emailValue = $request->get('email');
+        $email = is_string($emailValue) ? $emailValue : '';
+
         try {
             $this->commandBus->dispatch(
                 new ForgotPasswordCommand(
-                    $request->get('email')
+                    $email
                 )
             );
         } catch (Throwable $e) {
@@ -150,11 +159,16 @@ class AuthController extends ApiController
         ApiResetPasswordRequest $request,
         string $remember_token,
     ): JsonResponse {
+        $tokenValue = $request->get('token');
+        $passwordValue = $request->input('password');
+        $token = is_string($tokenValue) ? $tokenValue : '';
+        $password = is_string($passwordValue) ? $passwordValue : '';
+
         $this->commandBus->dispatch(
             new ResetPasswordCommand(
                 remember_token: $remember_token,
-                token: $request->get('token'),
-                password: $request->input('password'),
+                token: $token,
+                password: $password,
             )
         );
 

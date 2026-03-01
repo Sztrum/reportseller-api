@@ -9,6 +9,9 @@ use Throwable;
 
 class ForbiddenException extends HttpException
 {
+    /**
+     * @param array<string, string> $headers
+     */
     public function __construct(
         string $message = '',
         public int $statusCode = Response::HTTP_FORBIDDEN,

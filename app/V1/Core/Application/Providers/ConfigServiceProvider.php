@@ -16,7 +16,7 @@ abstract class ConfigServiceProvider extends ServiceProvider
 
     public function boot(
         ConfigContract $configRepository
-    ) {
+    ): void {
         $this->loadConfigs();
     }
 
@@ -24,12 +24,16 @@ abstract class ConfigServiceProvider extends ServiceProvider
     {
     }
 
-    private function loadConfigs()
+    private function loadConfigs(): void
     {
         $reflectionClass = new ReflectionClass($this);
+        $providerFile = $reflectionClass->getFileName();
+        if (!is_string($providerFile)) {
+            return;
+        }
 
         $configsPath = join(DIRECTORY_SEPARATOR, [
-            dirname($reflectionClass->getFileName()),
+            dirname($providerFile),
             static::CONFIGS_PATH,
         ]);
 
@@ -47,11 +51,21 @@ abstract class ConfigServiceProvider extends ServiceProvider
     {
         $routeProviderReflection = new ReflectionClass($this);
 
-        return Collection::make($this->app->getProviders(ModuleServiceProvider::class))
-            ->filter(function (ModuleServiceProvider $moduleServiceProvider) use ($routeProviderReflection) {
+        $provider = Collection::make($this->app->getProviders(ModuleServiceProvider::class))
+            ->filter(function ($moduleServiceProvider) use ($routeProviderReflection): bool {
+                if (!$moduleServiceProvider instanceof ModuleServiceProvider) {
+                    return false;
+                }
+
                 $reflection = new ReflectionClass($moduleServiceProvider);
 
                 return str_starts_with($routeProviderReflection->getNamespaceName(), $reflection->getNamespaceName());
             })->first();
+
+        if (!$provider instanceof ModuleServiceProvider) {
+            throw new \RuntimeException('Cannot resolve module provider for config service provider.');
+        }
+
+        return $provider;
     }
 }

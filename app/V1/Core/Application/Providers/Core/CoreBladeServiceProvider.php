@@ -23,6 +23,8 @@ class CoreBladeServiceProvider extends ServiceProvider
     private function declareArrayErrorDirective(): void
     {
         Blade::directive('arrayerror', function ($expression) {
+            $expression = is_string($expression) ? $expression : '';
+
             return '
                 <?php
                     $__errorArgs = [' . $expression . '];

@@ -13,8 +13,14 @@ class ApiVerifyEmailRequest extends FormRequest
         return true;
     }
 
+    /**
+     * @return array<string, list<string>>
+     */
     public function rules(): array
     {
-        return [];
+        /** @var array<string, list<string>> $rules */
+        $rules = [];
+
+        return $rules;
     }
 }

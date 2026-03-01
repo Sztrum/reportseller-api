@@ -26,6 +26,8 @@ class IsValidPasswordRule implements Rule
 
     public function passes($attribute, $value): bool
     {
+        $value = is_string($value) ? $value : '';
+
         $this->lengthPasses = (Str::length($value) >= 8);
         $this->uppercasePasses = (Str::lower($value) !== $value);
         $this->numericPasses = ((bool) preg_match('/[0-9]/', $value));
