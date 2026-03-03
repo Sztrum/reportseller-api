@@ -19,7 +19,6 @@ use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\Report
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
 use App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories\ReportStatusRepository;
-use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 
 readonly class ReportStoreCommandHandler implements CommandHandlerInterface
@@ -43,7 +42,6 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
      * @param  ReportStoreCommand $command
      * @throws Throwable
      */
-    #[NoReturn]
     public function handle(
         CommandInterface $command
     ): void {

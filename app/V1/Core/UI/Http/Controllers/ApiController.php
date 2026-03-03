@@ -44,7 +44,7 @@ class ApiController extends BaseController
      */
     protected function responseData(
         array $data,
-        string $message = null,
+        ?string $message = null,
         int $statusCode = Response::HTTP_OK
     ): JsonResponse {
         $array = ['status' => $statusCode];
