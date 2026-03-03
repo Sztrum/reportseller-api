@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Version
-v1.12.0
+v1.13.1
 
 ## Scope
 This document applies to the entire repository.
@@ -27,13 +27,16 @@ Read documents in this exact order before implementation:
 - Core shared layer: `app/V1/Core/**`
 - Shared utilities/value objects/migrations: `app/V1/Shared/**`
 - Modules:
-  - `app/V1/Modules/Auth/**`
-  - `app/V1/Modules/User/**`
-  - `app/V1/Modules/Country/**`
-  - `app/V1/Modules/Platform/**`
-  - `app/V1/Modules/Listing/**`
-  - `app/V1/Modules/Email/**`
-  - `app/V1/Modules/ReportCatalog/**`
+  - `app/V1/Modules/Auth/**` - API authentication and password reset flows.
+  - `app/V1/Modules/User/**` - user account lifecycle and profile-related domain logic.
+  - `app/V1/Modules/Country/**` - country dictionaries/entities and mapping utilities.
+  - `app/V1/Modules/Platform/**` - listing source platforms (for example slug/base URL metadata).
+  - `app/V1/Modules/ListingCatalog/**` - listing domain split into:
+    - `Listing` - current listing state.
+    - `ListingHistory` - historical snapshots for listing changes.
+    - `ListingChangeProposal` - queued/pending listing change proposals.
+  - `app/V1/Modules/Email/**` - email delivery/service integration.
+  - `app/V1/Modules/ReportCatalog/**` - report submission and supporting dictionaries:
     - `Report`
     - `ReportAuthor`
     - `ReportAttachment`
@@ -57,6 +60,7 @@ Read documents in this exact order before implementation:
 4. If a user says "dopisz/zmien w AGENTS.md", update all relevant AGENTS docs in scope (root and/or module).
 5. If a touched module gains non-trivial custom conventions and has no local `AGENTS.md`, create one in that module and register it in this file.
 6. If you detect verified documentation drift during any task, fix it in the same task.
+7. Keep all relevant `AGENTS*.md` documents updated continuously during implementation; do not postpone AGENTS updates to the end of the task.
 
 ## Rule ownership separation
 - Cross-project workflow/response rules -> `AGENTS_GLOBAL_WORKFLOW_RULES.md`
