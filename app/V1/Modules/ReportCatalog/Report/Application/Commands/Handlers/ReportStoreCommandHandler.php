@@ -6,8 +6,10 @@ namespace App\V1\Modules\ReportCatalog\Report\Application\Commands\Handlers;
 
 use App\V1\Core\Application\Command\CommandHandlerInterface;
 use App\V1\Core\Application\Command\CommandInterface;
-use App\V1\Modules\Listing\Infrastructure\Repositories\ListingRepository;
-use App\V1\Modules\Listing\Infrastructure\Repositories\ListingHistoryRepository;
+use App\V1\Modules\ListingCatalog\Listing\Infrastructure\Repositories\ListingRepository;
+use App\V1\Modules\ListingCatalog\ListingChangeProposal\Application\Services\ListingChangeProposalDiffService;
+use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
+use App\V1\Modules\ListingCatalog\ListingChangeProposal\Infrastructure\Repositories\ListingChangeProposalRepository;
 use App\V1\Modules\Platform\Domain\Aggregates\PlatformAggregate;
 use App\V1\Modules\Platform\Infrastructure\Repositories\PlatformRepository;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
@@ -27,7 +29,8 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         private ReportCategoryAggregate $reportCategoryAggregate,
         private ReportCategoryRepository $reportCategoryRepository,
         private ListingRepository $listingRepository,
-        private ListingHistoryRepository $listingHistoryRepository,
+        private ListingChangeProposalDiffService $listingChangeProposalDiffService,
+        private ListingChangeProposalRepository $listingChangeProposalRepository,
         private PlatformRepository $platformRepository,
         private ReportStatusRepository $reportStatusRepository,
         private ReportRepository $reportRepository,
@@ -63,28 +66,9 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             $listing = $this->listingRepository->firstByUrl($command->listingDTO->url);
         }
 
-        if ($listing === null) {
-            // TODO: move to aggregate
-            $listing = $this->listingRepository->create([
-                "platform_id" => $platform->id,
-                "report_category_id" => $category->id,
-                'external_id' => $command->listingDTO->external_id,
-                'url' => $command->listingDTO->url,
-                'title' => $command->listingDTO->title,
-                'description' => $command->listingDTO->description,
-                'price' => $command->listingDTO->price,
-                'currency' => $command->listingDTO->currency,
-                'seller_type' => $command->listingDTO->seller_type,
-                'seller_name' => $command->listingDTO->seller_name,
-                'location' => $command->listingDTO->location,
-                'thumbnail_url' => $command->listingDTO->thumbnail_url,
-                'is_active_external' => $command->listingDTO->is_active_external,
-            ]);
-        }
-
-        $lastSnapshot = $this->listingHistoryRepository->latestForListing($listing->id);
-        $snapshot = [
-            'listing_id' => $listing->id,
+        $listingPayload = [
+            'platform_id' => $platform->id,
+            'report_category_id' => $category->id,
             'external_id' => $command->listingDTO->external_id,
             'url' => $command->listingDTO->url,
             'title' => $command->listingDTO->title,
@@ -96,35 +80,10 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'location' => $command->listingDTO->location,
             'thumbnail_url' => $command->listingDTO->thumbnail_url,
             'is_active_external' => $command->listingDTO->is_active_external,
-            'captured_at' => now(),
         ];
 
-        $hasChanges = $lastSnapshot === null;
-        if ($lastSnapshot !== null) {
-            $fields = [
-                'external_id',
-                'url',
-                'title',
-                'description',
-                'price',
-                'currency',
-                'seller_type',
-                'seller_name',
-                'location',
-                'thumbnail_url',
-                'is_active_external',
-            ];
-
-            foreach ($fields as $field) {
-                if ($lastSnapshot->getAttribute($field) !== $snapshot[$field]) {
-                    $hasChanges = true;
-                    break;
-                }
-            }
-        }
-
-        if ($hasChanges) {
-            $this->listingHistoryRepository->create($snapshot);
+        if ($listing === null) {
+            $listing = $this->listingRepository->create($listingPayload);
         }
 
         $reportStatus = $this->reportStatusRepository->firstBySlug('new');
@@ -142,6 +101,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'listing_id' => $listing->id,
             'report_status_id' => $reportStatus->id,
             'report_author_id' => $author->id,
+            'title' => $command->reportDTO->title,
             'description' => $command->reportDTO->description,
             'moderation_note' => null,
             'is_published' => false,
@@ -158,5 +118,26 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
                 'size_bytes' => $attachment->size_bytes,
             ]);
         }
+
+        $latestPendingProposal = $this->listingChangeProposalRepository->latestPendingForListing($listing->id);
+        $shouldCreateProposal = $this->listingChangeProposalDiffService->shouldCreateProposal($listing, $listingPayload);
+        $hasDuplicatePendingProposal = $latestPendingProposal !== null
+            && $latestPendingProposal->proposed_payload === $listingPayload;
+
+        if (!$shouldCreateProposal || $hasDuplicatePendingProposal) {
+            return;
+        }
+
+        $this->listingChangeProposalRepository->create([
+            'listing_id' => $listing->id,
+            'report_id' => $report->id,
+            'status' => ListingChangeProposal::STATUS_PENDING,
+            'current_payload' => $this->listingChangeProposalDiffService->currentPayload($listing),
+            'proposed_payload' => $listingPayload,
+            'requested_at' => now(),
+            'reviewed_at' => null,
+            'reviewed_by' => null,
+            'review_reason' => null,
+        ]);
     }
 }

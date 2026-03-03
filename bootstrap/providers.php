@@ -6,7 +6,7 @@ return [
     App\V1\Modules\Auth\AuthModuleServiceProvider::class,
     App\V1\Modules\Country\CountryModuleServiceProvider::class,
     App\V1\Modules\Email\EmailModuleServiceProvider::class,
-    App\V1\Modules\Listing\ListingModuleServiceProvider::class,
+    App\V1\Modules\ListingCatalog\ListingCatalogModuleServiceProvider::class,
     App\V1\Modules\ReportCatalog\ReportCatalogModuleServiceProvider::class,
     App\V1\Modules\User\UserModuleServiceProvider::class,
 ];
