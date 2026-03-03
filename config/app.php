@@ -123,4 +123,5 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'frontend_url' => env('FRONTEND_APP_URL', 'http://reportseller.test'),
 ];

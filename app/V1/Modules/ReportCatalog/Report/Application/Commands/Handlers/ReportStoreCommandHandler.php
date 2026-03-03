@@ -17,7 +17,6 @@ use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\Report
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
 use App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories\ReportStatusRepository;
-use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 
 readonly class ReportStoreCommandHandler implements CommandHandlerInterface
@@ -40,7 +39,6 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
      * @param  ReportStoreCommand $command
      * @throws Throwable
      */
-    #[NoReturn]
     public function handle(
         CommandInterface $command
     ): void {
@@ -64,7 +62,6 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         }
 
         if ($listing === null) {
-            // TODO: move to aggregate
             $listing = $this->listingRepository->create([
                 "platform_id" => $platform->id,
                 "report_category_id" => $category->id,
@@ -142,6 +139,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'listing_id' => $listing->id,
             'report_status_id' => $reportStatus->id,
             'report_author_id' => $author->id,
+            'title' => $command->reportDTO->title,
             'description' => $command->reportDTO->description,
             'moderation_note' => null,
             'is_published' => false,

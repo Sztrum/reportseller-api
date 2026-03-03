@@ -33,7 +33,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         });
     }
 
-    public function isJob(IncomingEntry $entry, string $jobClass = null): bool
+    public function isJob(IncomingEntry $entry, ?string $jobClass = null): bool
     {
         if ($entry->type === EntryType::JOB) {
             if (!$jobClass) {
@@ -60,7 +60,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         return Str::startsWith($this->entryUri($entry), '/api');
     }
 
-    public function isEvent(IncomingEntry $entry, string $eventClass = null): bool
+    public function isEvent(IncomingEntry $entry, ?string $eventClass = null): bool
     {
         if ($entry->type === 'event') {
             if (!$eventClass) {
@@ -116,7 +116,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         return $entry->type === EntryType::EXCEPTION;
     }
 
-    public function isRequestWithStatus(IncomingEntry $entry, string $method = null, int $status = null): bool
+    public function isRequestWithStatus(IncomingEntry $entry, ?string $method = null, ?int $status = null): bool
     {
         if ($entry->type === EntryType::REQUEST) {
             if ($method && $status) {
@@ -137,7 +137,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
         return false;
     }
 
-    public function isRequest(IncomingEntry $entry, string $method = null): bool
+    public function isRequest(IncomingEntry $entry, ?string $method = null): bool
     {
         if ($entry->type === EntryType::REQUEST) {
             if ($method) {

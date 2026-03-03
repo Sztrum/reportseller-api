@@ -3,5 +3,5 @@
 declare(strict_types=1);
 
 return [
-    'url' => env('FRONTEND_APP_URL', 'http://reportseller.test'),
+    'url' => config('app.frontend_url', 'http://reportseller.test'),
 ];
