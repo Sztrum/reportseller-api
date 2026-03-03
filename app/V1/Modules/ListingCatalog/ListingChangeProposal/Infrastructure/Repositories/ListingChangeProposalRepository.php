@@ -18,4 +18,18 @@ class ListingChangeProposalRepository extends EloquentModelRepository
     {
         return 'listing-change-proposal';
     }
+
+    public function latestPendingForListing(
+        string $listingId
+    ): ?ListingChangeProposal {
+        /** @var ListingChangeProposal|null $proposal */
+        $proposal = $this->query()
+            ->where('listing_id', $listingId)
+            ->where('status', ListingChangeProposal::STATUS_PENDING)
+            ->orderByDesc('requested_at')
+            ->orderByDesc('created_at')
+            ->first();
+
+        return $proposal;
+    }
 }

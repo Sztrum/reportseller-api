@@ -12,7 +12,6 @@ class Listing extends Model
 {
     /** @use HasFactory<ListingFactory> */
     use HasFactory;
-
     protected $fillable = [
         'platform_id',
         'report_category_id',

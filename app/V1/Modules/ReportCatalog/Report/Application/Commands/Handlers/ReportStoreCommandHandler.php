@@ -8,8 +8,6 @@ use App\V1\Core\Application\Command\CommandHandlerInterface;
 use App\V1\Core\Application\Command\CommandInterface;
 use App\V1\Modules\ListingCatalog\Listing\Infrastructure\Repositories\ListingRepository;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Application\Services\ListingChangeProposalDiffService;
-use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Aggregates\ListingChangeProposalAggregate;
-use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Exceptions\ListingChangeProposalNotChangedException;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Infrastructure\Repositories\ListingChangeProposalRepository;
 use App\V1\Modules\Platform\Domain\Aggregates\PlatformAggregate;
@@ -32,7 +30,6 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         private ReportCategoryRepository $reportCategoryRepository,
         private ListingRepository $listingRepository,
         private ListingChangeProposalDiffService $listingChangeProposalDiffService,
-        private ListingChangeProposalAggregate $listingChangeProposalAggregate,
         private ListingChangeProposalRepository $listingChangeProposalRepository,
         private PlatformRepository $platformRepository,
         private ReportStatusRepository $reportStatusRepository,
@@ -122,11 +119,12 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             ]);
         }
 
-        try {
-            $this->listingChangeProposalAggregate->ensureProposalHasChanges(
-                $this->listingChangeProposalDiffService->shouldCreateProposal($listing, $listingPayload)
-            );
-        } catch (ListingChangeProposalNotChangedException) {
+        $latestPendingProposal = $this->listingChangeProposalRepository->latestPendingForListing($listing->id);
+        $shouldCreateProposal = $this->listingChangeProposalDiffService->shouldCreateProposal($listing, $listingPayload);
+        $hasDuplicatePendingProposal = $latestPendingProposal !== null
+            && $latestPendingProposal->proposed_payload === $listingPayload;
+
+        if (!$shouldCreateProposal || $hasDuplicatePendingProposal) {
             return;
         }
 
@@ -142,5 +140,4 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'review_reason' => null,
         ]);
     }
-
 }
