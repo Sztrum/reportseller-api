@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\V1\Modules\Listing\Domain\Models\ListingHistory;
+use App\V1\Modules\ListingCatalog\ListingHistory\Domain\Models\ListingHistory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

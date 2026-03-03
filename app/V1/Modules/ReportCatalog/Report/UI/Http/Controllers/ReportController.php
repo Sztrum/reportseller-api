@@ -6,7 +6,7 @@ namespace App\V1\Modules\ReportCatalog\Report\UI\Http\Controllers;
 
 use App\V1\Core\Application\Command\CommandBusInterface;
 use App\V1\Core\UI\Http\Controllers\ApiController;
-use App\V1\Modules\Listing\Domain\DTO\ListingDTO;
+use App\V1\Modules\ListingCatalog\Listing\Domain\DTO\ListingDTO;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
 use App\V1\Modules\ReportCatalog\Report\Domain\DTO\ReportDTO;
 use App\V1\Modules\ReportCatalog\Report\UI\Http\Requests\ReportStoreRequest;

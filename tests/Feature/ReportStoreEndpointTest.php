@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\V1\Modules\Listing\Domain\Models\Listing;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
+use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
 use App\V1\Modules\Platform\Domain\Models\Platform;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models\ReportCategory;
 use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
@@ -41,7 +42,8 @@ class ReportStoreEndpointTest extends TestCase
         $listing = Listing::query()->first();
         $this->assertNotNull($listing);
 
-        $this->assertDatabaseCount('listing_histories', 1);
+        $this->assertDatabaseCount('listing_histories', 0);
+        $this->assertDatabaseCount('listing_change_proposals', 0);
         $this->assertDatabaseHas('reports', [
             'listing_id' => $listing->id,
             'title' => 'Podejrzane ogloszenie',
@@ -51,7 +53,7 @@ class ReportStoreEndpointTest extends TestCase
         $this->assertDatabaseCount('report_attachments', 1);
     }
 
-    public function test_it_does_not_create_new_listing_history_when_listing_data_is_unchanged(): void
+    public function test_it_does_not_create_change_proposal_when_listing_data_is_unchanged(): void
     {
         $this->seedStoreDependencies();
 
@@ -72,8 +74,130 @@ class ReportStoreEndpointTest extends TestCase
         $this->postJson(route('api.reports.store'), $secondPayload)->assertOk();
 
         $this->assertDatabaseCount('listings', 1);
-        $this->assertDatabaseCount('listing_histories', 1);
+        $this->assertDatabaseCount('listing_histories', 0);
+        $this->assertDatabaseCount('listing_change_proposals', 0);
         $this->assertDatabaseCount('reports', 2);
+    }
+
+    public function test_it_creates_pending_change_proposal_when_existing_listing_data_changes(): void
+    {
+        $this->seedStoreDependencies();
+
+        $firstPayload = $this->buildPayload(
+            listingOverrides: [
+                'url' => 'https://olx.pl/oferta/777',
+                'price' => 1200,
+                'title' => 'Pierwszy tytul',
+            ]
+        );
+
+        $this->postJson(route('api.reports.store'), $firstPayload)->assertOk();
+
+        $secondPayload = $this->buildPayload(
+            listingOverrides: [
+                'url' => 'https://olx.pl/oferta/777',
+                'price' => 1500,
+                'title' => 'Nowszy tytul',
+            ],
+            reportOverrides: [
+                'title' => 'Drugie zgloszenie',
+                'description' => 'Drugie zgloszenie z aktualizacja danych listingu.',
+            ]
+        );
+
+        $this->postJson(route('api.reports.store'), $secondPayload)->assertOk();
+
+        $listing = Listing::query()->first();
+        $this->assertNotNull($listing);
+
+        $this->assertDatabaseHas('listings', [
+            'id' => $listing->id,
+            'price' => '1200',
+            'title' => 'Pierwszy tytul',
+        ]);
+
+        /** @var ListingChangeProposal|null $changeProposal */
+        $changeProposal = ListingChangeProposal::query()->first();
+        $this->assertNotNull($changeProposal);
+        $this->assertSame(ListingChangeProposal::STATUS_PENDING, $changeProposal->status);
+
+        $this->assertSame(1200, $changeProposal->current_payload['price']);
+        $this->assertSame('Pierwszy tytul', $changeProposal->current_payload['title']);
+        $this->assertSame(1500, $changeProposal->proposed_payload['price']);
+        $this->assertSame('Nowszy tytul', $changeProposal->proposed_payload['title']);
+        $this->assertDatabaseCount('listing_histories', 0);
+    }
+
+    public function test_it_does_not_create_duplicate_pending_change_proposal_for_identical_payload(): void
+    {
+        $this->seedStoreDependencies();
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: [
+                'url' => 'https://olx.pl/oferta/4321',
+                'price' => 1000,
+                'title' => 'Tytul bazowy',
+            ]
+        ))->assertOk();
+
+        $changedPayload = $this->buildPayload(
+            listingOverrides: [
+                'url' => 'https://olx.pl/oferta/4321',
+                'price' => 1400,
+                'title' => 'Tytul po zmianie',
+            ],
+            reportOverrides: [
+                'title' => 'Pierwsza propozycja zmiany',
+                'description' => 'Pierwszy raport z ta sama zmiana danych listingu.',
+            ]
+        );
+
+        $this->postJson(route('api.reports.store'), $changedPayload)->assertOk();
+        $this->postJson(route('api.reports.store'), $changedPayload)->assertOk();
+
+        $this->assertDatabaseCount('listing_change_proposals', 1);
+
+        /** @var ListingChangeProposal|null $changeProposal */
+        $changeProposal = ListingChangeProposal::query()->first();
+        $this->assertNotNull($changeProposal);
+        $this->assertSame(ListingChangeProposal::STATUS_PENDING, $changeProposal->status);
+        $this->assertSame(1400, $changeProposal->proposed_payload['price']);
+        $this->assertSame('Tytul po zmianie', $changeProposal->proposed_payload['title']);
+    }
+
+    public function test_change_proposal_review_endpoint_is_not_available(): void
+    {
+        $this->seedStoreDependencies();
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: [
+                'url' => 'https://olx.pl/oferta/888',
+                'price' => 1100,
+                'title' => 'Stary tytul',
+            ]
+        ))->assertOk();
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: [
+                'url' => 'https://olx.pl/oferta/888',
+                'price' => 1700,
+                'title' => 'Nowy tytul',
+            ],
+            reportOverrides: [
+                'title' => 'Zmiana danych',
+                'description' => 'Prosze o aktualizacje danych listingu.',
+            ]
+        ))->assertOk();
+
+        /** @var ListingChangeProposal|null $changeProposal */
+        $changeProposal = ListingChangeProposal::query()->first();
+        $this->assertNotNull($changeProposal);
+
+        $this->postJson('/v1/listing-catalog-listing-change-proposals/' . $changeProposal->id . '/review', [
+            'decision' => ListingChangeProposal::STATUS_APPROVED,
+            'reviewed_by' => 'moderator@example.com',
+            'review_reason' => 'Potwierdzono wiarygodnosc zmiany.',
+        ])->assertNotFound();
     }
 
     private function seedStoreDependencies(): void
