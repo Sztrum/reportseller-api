@@ -35,4 +35,21 @@ final class ReportAuthorFactory extends Factory
             'blocked_at' => now(),
         ]);
     }
+
+    public function consented(string $version = 'v1'): self
+    {
+        return $this->state([
+            'consent_version' => $version,
+            'consent_given_at' => now()->subHours(2),
+        ]);
+    }
+
+    public function anonymous(): self
+    {
+        return $this->state([
+            'ip_hash' => null,
+            'consent_version' => null,
+            'consent_given_at' => null,
+        ]);
+    }
 }

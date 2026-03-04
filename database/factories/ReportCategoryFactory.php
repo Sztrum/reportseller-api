@@ -27,4 +27,14 @@ class ReportCategoryFactory extends Factory
             'is_active' => $this->faker->boolean(80),
         ];
     }
+
+    public function fraud(): self
+    {
+        return $this->state([
+            'slug' => 'fraud',
+            'name' => 'Fraud',
+            'description' => 'Podejrzenie oszustwa.',
+            'is_active' => true,
+        ]);
+    }
 }
