@@ -6,11 +6,12 @@ namespace App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\ReportStatusFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[UseFactory(ReportStatusFactory::class)]
 class ReportStatus extends Model
 {
-    /** @use HasFactory<ReportStatusFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -23,8 +24,4 @@ class ReportStatus extends Model
         'is_active' => 'bool',
     ];
 
-    protected static function newFactory(): ReportStatusFactory
-    {
-        return ReportStatusFactory::new();
-    }
 }

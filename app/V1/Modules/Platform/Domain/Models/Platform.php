@@ -6,11 +6,12 @@ namespace App\V1\Modules\Platform\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\PlatformFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[UseFactory(PlatformFactory::class)]
 class Platform extends Model
 {
-    /** @use HasFactory<PlatformFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -25,8 +26,4 @@ class Platform extends Model
         'is_active' => 'bool',
     ];
 
-    protected static function newFactory(): PlatformFactory
-    {
-        return PlatformFactory::new();
-    }
 }

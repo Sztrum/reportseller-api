@@ -27,14 +27,4 @@ class PlatformFactory extends Factory
             'is_active' => $this->faker->boolean(80),
         ];
     }
-
-    public function olx(): self
-    {
-        return $this->state([
-            'name' => 'OLX',
-            'slug' => 'olx',
-            'base_url' => 'https://www.olx.pl',
-            'is_active' => true,
-        ]);
-    }
 }

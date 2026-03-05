@@ -5,14 +5,9 @@ declare(strict_types=1);
 namespace App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
-use Database\Factories\ListingChangeProposalFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ListingChangeProposal extends Model
 {
-    /** @use HasFactory<ListingChangeProposalFactory> */
-    use HasFactory;
-
     public const STATUS_PENDING = 'pending';
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
@@ -36,8 +31,4 @@ class ListingChangeProposal extends Model
         'reviewed_at' => 'datetime',
     ];
 
-    protected static function newFactory(): ListingChangeProposalFactory
-    {
-        return ListingChangeProposalFactory::new();
-    }
 }

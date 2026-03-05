@@ -6,11 +6,12 @@ namespace App\V1\Modules\ListingCatalog\Listing\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\ListingFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[UseFactory(ListingFactory::class)]
 class Listing extends Model
 {
-    /** @use HasFactory<ListingFactory> */
     use HasFactory;
     protected $fillable = [
         'platform_id',

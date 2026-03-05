@@ -26,38 +26,4 @@ class ReportStatusFactory extends Factory
             'is_active' => $this->faker->boolean(80),
         ];
     }
-
-    public function statusNew(): self
-    {
-        return $this->status('new', 'Nowe');
-    }
-
-    public function inProgress(): self
-    {
-        return $this->status('in-progress', 'W trakcie');
-    }
-
-    public function confirmed(): self
-    {
-        return $this->status('confirmed', 'Potwierdzone');
-    }
-
-    public function rejected(): self
-    {
-        return $this->status('rejected', 'Odrzucone');
-    }
-
-    public function duplicate(): self
-    {
-        return $this->status('duplicate', 'Duplikat');
-    }
-
-    private function status(string $slug, string $name): self
-    {
-        return $this->state([
-            'slug' => $slug,
-            'name' => $name,
-            'is_active' => true,
-        ]);
-    }
 }
