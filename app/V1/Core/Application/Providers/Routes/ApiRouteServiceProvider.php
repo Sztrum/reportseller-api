@@ -54,7 +54,7 @@ abstract class ApiRouteServiceProvider extends RouteServiceProvider
             })->first();
 
         if (!$provider instanceof ModuleServiceProvider) {
-            throw new \RuntimeException('Cannot resolve module provider for api routes.');
+            throw new \RuntimeException(__('core::domain.api_route_module_provider_not_resolved'));
         }
 
         return $provider;

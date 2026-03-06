@@ -212,7 +212,10 @@ if (!function_exists('get_remote_file_info')) {
                         ]);
                     }
                 } else {
-                    throw new App\V1\Core\Domain\Exceptions\DomainException('Could not fetch the file: ' . $url);
+                    throw new App\V1\Core\Domain\Exceptions\DomainException(
+                        'core::domain.remote_file_fetch_failed',
+                        ['url' => $url]
+                    );
                 }
             });
         } catch (Exception $e) {

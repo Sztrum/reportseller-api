@@ -43,7 +43,7 @@ abstract class BaseUpdateRequest extends FormRequest
             }
 
             if (!$nameFilled) {
-                $validator->errors()->add($errorKey, 'Pole "name" musi być wypełnione w co najmniej jednym języku.');
+                $validator->errors()->add($errorKey, __('core::validation.name_required_in_one_language'));
             }
         });
     }

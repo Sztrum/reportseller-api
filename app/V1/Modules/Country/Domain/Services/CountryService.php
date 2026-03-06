@@ -27,7 +27,12 @@ readonly class CountryService
     {
         $countryConfig = $this->config->get('countries::countries.countries.' . strtoupper($code));
 
-        throw_if(!is_array($countryConfig), CountryNotFoundException::class, 'Country not found');
+        throw_if(
+            !is_array($countryConfig),
+            CountryNotFoundException::class,
+            null,
+            ['code' => strtoupper($code)]
+        );
 
         return $this->countryEntityMapper->parseToEntity($this->normalizeCountryData($countryConfig, $code));
     }
@@ -39,7 +44,12 @@ readonly class CountryService
     {
         $native = $this->getCountryByCode($code)->getNative();
 
-        throw_if(!$native, CountryNativeNameNotFoundException::class, 'Country native name not found');
+        throw_if(
+            !$native,
+            CountryNativeNameNotFoundException::class,
+            null,
+            ['code' => strtoupper($code)]
+        );
 
         return $native;
     }

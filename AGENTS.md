@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Version
-v1.15.0
+v1.16.0
 
 ## Scope
 This document applies to the entire repository.
@@ -50,6 +50,7 @@ Read documents in this exact order before implementation:
 - Keep business rules, exceptions, DTOs, queries/commands, and repositories inside the owning module namespace.
 - Do not move module-specific logic into `Core` unless it is truly shared by multiple modules.
 - Do not add new entries to `config/constants.php`; prefer module/core config files.
+- Every new user-facing or operator-facing text introduced in runtime code must be defined through translations instead of inline literals; for this repository, add the key in the relevant Polish translation file in the owning `Application/Translations/pl` scope immediately in the same task, while other languages may stay unchanged unless explicitly requested.
 - Whenever a task adds at least one new migration file in `database/migrations`, run `php artisan migrate` in the same task as mandatory verification.
 - For backend/domain changes, run at least focused tests (`php artisan test --filter=...`) or explain why tests were not run.
 - For frontend asset changes (Vite/Tailwind/JS/SCSS), run `npm install` (if deps changed) and `npm run build` at repository root.

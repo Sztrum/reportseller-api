@@ -63,7 +63,7 @@ abstract class ConfigServiceProvider extends ServiceProvider
             })->first();
 
         if (!$provider instanceof ModuleServiceProvider) {
-            throw new \RuntimeException('Cannot resolve module provider for config service provider.');
+            throw new \RuntimeException(__('core::domain.config_service_provider_module_provider_not_resolved'));
         }
 
         return $provider;

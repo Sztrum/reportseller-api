@@ -35,9 +35,11 @@ abstract class ModuleServiceProvider extends ServiceProvider
         foreach (self::$registeredModules as $registeredModule) {
             if ($registeredModule['name'] === $moduleName && $registeredModule['path'] !== $modulePath) {
                 throw new InvalidArgumentException(
-                    "Module name '{$moduleName}' is already registered with a different provider path.\n"
-                    . "Module 1: Path - {$registeredModule['path']}\n"
-                    . "Module 2: Path - {$modulePath}"
+                    __('core::domain.module_name_registered_with_different_path', [
+                        'moduleName' => $moduleName,
+                        'firstPath' => $registeredModule['path'],
+                        'secondPath' => $modulePath,
+                    ])
                 );
             }
         }
@@ -67,7 +69,7 @@ abstract class ModuleServiceProvider extends ServiceProvider
 
         $providerFile = $reflectionClass->getFileName();
         if (!is_string($providerFile)) {
-            throw new \RuntimeException('Cannot resolve module provider path.');
+            throw new \RuntimeException(__('core::domain.module_provider_path_not_resolved'));
         }
 
         return dirname($providerFile);
