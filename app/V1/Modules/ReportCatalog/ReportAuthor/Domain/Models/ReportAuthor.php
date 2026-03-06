@@ -6,8 +6,20 @@ namespace App\V1\Modules\ReportCatalog\ReportAuthor\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\ReportAuthorFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property string $id
+ * @property string $ip_hash
+ * @property string $consent_version
+ * @property \Illuminate\Support\Carbon $consent_given_at
+ * @property bool $is_blocked
+ * @property \Illuminate\Support\Carbon|null $blocked_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
+#[UseFactory(ReportAuthorFactory::class)]
 class ReportAuthor extends Model
 {
     /** @use HasFactory<ReportAuthorFactory> */

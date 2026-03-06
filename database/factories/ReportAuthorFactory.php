@@ -17,22 +17,12 @@ final class ReportAuthorFactory extends Factory
 
     public function definition(): array
     {
-        $consented = $this->faker->boolean(70);
-
         return [
-            'ip_hash' => $this->faker->optional()->sha256(),
-            'consent_version' => $consented ? $this->faker->randomElement(['v1', 'v1.1']) : null,
-            'consent_given_at' => $consented ? now()->subDays($this->faker->numberBetween(0, 30)) : null,
+            'ip_hash' => hash('sha256', $this->faker->ipv4()),
+            'consent_version' => 'v1',
+            'consent_given_at' => $this->faker->dateTimeBetween('-6 months'),
             'is_blocked' => false,
             'blocked_at' => null,
         ];
-    }
-
-    public function blocked(): self
-    {
-        return $this->state([
-            'is_blocked' => true,
-            'blocked_at' => now(),
-        ]);
     }
 }

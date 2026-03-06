@@ -79,6 +79,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'thumbnail_url' => $command->listingDTO->thumbnail_url,
             'is_active_external' => $command->listingDTO->is_active_external,
         ];
+        ksort($listingPayload);
 
         if ($listing === null) {
             $listing = $this->listingRepository->create($listingPayload);
@@ -118,19 +119,41 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         }
 
         $latestPendingProposal = $this->listingChangeProposalRepository->latestPendingForListing($listing->id);
-        $shouldCreateProposal = $this->listingChangeProposalDiffService->shouldCreateProposal($listing, $listingPayload);
-        $hasDuplicatePendingProposal = $latestPendingProposal !== null
-            && $latestPendingProposal->proposed_payload === $listingPayload;
+        $shouldCreateProposal = $this->listingChangeProposalDiffService->hasListingPayloadChanges($listing, $listingPayload);
+        $hasDuplicatePendingProposal = false;
+
+        if ($latestPendingProposal !== null) {
+            $latestPendingProposalPayload = $latestPendingProposal->proposed_payload;
+            ksort($latestPendingProposalPayload);
+            $hasDuplicatePendingProposal = $latestPendingProposalPayload === $listingPayload;
+        }
 
         if (!$shouldCreateProposal || $hasDuplicatePendingProposal) {
             return;
         }
 
+        $currentPayload = [
+            'platform_id' => $listing->platform_id,
+            'report_category_id' => $listing->report_category_id,
+            'external_id' => $listing->external_id,
+            'url' => $listing->url,
+            'title' => $listing->title,
+            'description' => $listing->description,
+            'price' => $listing->price,
+            'currency' => $listing->currency,
+            'seller_type' => $listing->seller_type,
+            'seller_name' => $listing->seller_name,
+            'location' => $listing->location,
+            'thumbnail_url' => $listing->thumbnail_url,
+            'is_active_external' => $listing->is_active_external,
+        ];
+        ksort($currentPayload);
+
         $this->listingChangeProposalRepository->create([
             'listing_id' => $listing->id,
             'report_id' => $report->id,
             'status' => ListingChangeProposal::STATUS_PENDING,
-            'current_payload' => $this->listingChangeProposalDiffService->currentPayload($listing),
+            'current_payload' => $currentPayload,
             'proposed_payload' => $listingPayload,
             'requested_at' => now(),
             'reviewed_at' => null,

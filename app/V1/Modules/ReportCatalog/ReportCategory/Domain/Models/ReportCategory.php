@@ -6,11 +6,22 @@ namespace App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\ReportCategoryFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property string $id
+ * @property string $slug
+ * @property string $name
+ * @property string|null $description
+ * @property int $order
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
+#[UseFactory(ReportCategoryFactory::class)]
 class ReportCategory extends Model
 {
-    /** @use HasFactory<ReportCategoryFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -24,9 +35,4 @@ class ReportCategory extends Model
     protected $casts = [
         'is_active' => 'bool',
     ];
-
-    protected static function newFactory(): ReportCategoryFactory
-    {
-        return ReportCategoryFactory::new();
-    }
 }

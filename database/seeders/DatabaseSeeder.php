@@ -13,5 +13,15 @@ class DatabaseSeeder extends Seeder
             ReportCategorySeeder::class,
             ReportStatusSeeder::class,
         ]);
+
+        if (!app()->environment('production')) {
+            $this->call([
+                UserSeeder::class,
+                ListingSeeder::class,
+                ReportSeeder::class,
+                ListingHistorySeeder::class,
+                ListingChangeProposalSeeder::class,
+            ]);
+        }
     }
 }

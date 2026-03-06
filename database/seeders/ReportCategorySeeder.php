@@ -12,17 +12,24 @@ final class ReportCategorySeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Motoryzacja', 'slug' => 'motoryzacja', 'order' => 1],
-            ['name' => 'Nieruchomości', 'slug' => 'nieruchomosci', 'order' => 2],
-            ['name' => 'Elektronika', 'slug' => 'elektronika', 'order' => 3],
-            ['name' => 'Dom i ogród', 'slug' => 'dom-i-ogrod', 'order' => 4],
-            ['name' => 'Moda', 'slug' => 'moda', 'order' => 5],
-            ['name' => 'Dziecko', 'slug' => 'dziecko', 'order' => 6],
-            ['name' => 'Sport i hobby', 'slug' => 'sport-i-hobby', 'order' => 7],
-            ['name' => 'Zwierzęta', 'slug' => 'zwierzeta', 'order' => 8],
-            ['name' => 'Praca', 'slug' => 'praca', 'order' => 9],
-            ['name' => 'Usługi', 'slug' => 'uslugi', 'order' => 10],
-            ['name' => 'Inne', 'slug' => 'inne', 'order' => 11],
+            ['name' => 'Ogólne', 'slug' => 'ogolne', 'order' => 1],
+            ['name' => 'Motoryzacja', 'slug' => 'motoryzacja', 'order' => 2],
+            ['name' => 'Nieruchomości', 'slug' => 'nieruchomosci', 'order' => 3],
+            ['name' => 'Praca', 'slug' => 'praca', 'order' => 4],
+            ['name' => 'Usługi', 'slug' => 'uslugi', 'order' => 5],
+            ['name' => 'Elektronika', 'slug' => 'elektronika', 'order' => 6],
+            ['name' => 'Dom i ogród', 'slug' => 'dom-i-ogrod', 'order' => 7],
+            ['name' => 'Moda', 'slug' => 'moda', 'order' => 8],
+            ['name' => 'Dziecko', 'slug' => 'dziecko', 'order' => 9],
+            ['name' => 'Sport i hobby', 'slug' => 'sport-i-hobby', 'order' => 10],
+            ['name' => 'Zwierzęta', 'slug' => 'zwierzeta', 'order' => 11],
+            ['name' => 'Rolnictwo', 'slug' => 'rolnictwo', 'order' => 12],
+            ['name' => 'Firma i przemysł', 'slug' => 'firma-i-przemysl', 'order' => 13],
+            ['name' => 'Budownictwo', 'slug' => 'budownictwo', 'order' => 14],
+            ['name' => 'Zdrowie i uroda', 'slug' => 'zdrowie-i-uroda', 'order' => 15],
+            ['name' => 'Turystyka i noclegi', 'slug' => 'turystyka-i-noclegi', 'order' => 16],
+            ['name' => 'Kolekcje i sztuka', 'slug' => 'kolekcje-i-sztuka', 'order' => 17],
+            ['name' => 'Inne', 'slug' => 'inne', 'order' => 18],
         ];
 
         foreach ($categories as $c) {
@@ -35,10 +42,6 @@ final class ReportCategorySeeder extends Seeder
                     'is_active' => true,
                 ],
             );
-        }
-
-        if (!app()->environment('production')) {
-            ReportCategory::factory(2)->create();
         }
     }
 }

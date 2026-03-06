@@ -28,9 +28,5 @@ final class ReportStatusSeeder extends Seeder
                 ],
             );
         }
-
-        if (!app()->environment('production')) {
-            ReportStatus::factory(2)->create();
-        }
     }
 }
