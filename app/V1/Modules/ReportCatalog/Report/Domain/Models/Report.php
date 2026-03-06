@@ -6,9 +6,25 @@ namespace App\V1\Modules\ReportCatalog\Report\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
 use Database\Factories\ReportFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $id
+ * @property string $listing_id
+ * @property string $report_status_id
+ * @property string $report_author_id
+ * @property string $title
+ * @property string $description
+ * @property string|null $moderation_note
+ * @property bool $is_published
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ */
+#[UseFactory(ReportFactory::class)]
 class Report extends Model
 {
     /** @use HasFactory<ReportFactory> */

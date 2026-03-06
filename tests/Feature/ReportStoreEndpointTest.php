@@ -6,9 +6,9 @@ namespace Tests\Feature;
 
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
-use App\V1\Modules\Platform\Domain\Models\Platform;
-use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models\ReportCategory;
-use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
+use Database\Seeders\PlatformSeeder;
+use Database\Seeders\ReportCategorySeeder;
+use Database\Seeders\ReportStatusSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -121,10 +121,12 @@ class ReportStoreEndpointTest extends TestCase
         $this->assertNotNull($changeProposal);
         $this->assertSame(ListingChangeProposal::STATUS_PENDING, $changeProposal->status);
 
-        $this->assertSame(1200, $changeProposal->current_payload['price']);
-        $this->assertSame('Pierwszy tytul', $changeProposal->current_payload['title']);
-        $this->assertSame(1500, $changeProposal->proposed_payload['price']);
-        $this->assertSame('Nowszy tytul', $changeProposal->proposed_payload['title']);
+        $this->assertEquals($this->expectedCurrentPayload($listing), $changeProposal->current_payload);
+        $this->assertEquals($this->expectedProposalPayload([
+            'url' => 'https://olx.pl/oferta/777',
+            'price' => 1500,
+            'title' => 'Nowszy tytul',
+        ], $listing), $changeProposal->proposed_payload);
         $this->assertDatabaseCount('listing_histories', 0);
     }
 
@@ -161,8 +163,13 @@ class ReportStoreEndpointTest extends TestCase
         $changeProposal = ListingChangeProposal::query()->first();
         $this->assertNotNull($changeProposal);
         $this->assertSame(ListingChangeProposal::STATUS_PENDING, $changeProposal->status);
-        $this->assertSame(1400, $changeProposal->proposed_payload['price']);
-        $this->assertSame('Tytul po zmianie', $changeProposal->proposed_payload['title']);
+        $listing = Listing::query()->first();
+        $this->assertNotNull($listing);
+        $this->assertEquals($this->expectedProposalPayload([
+            'url' => 'https://olx.pl/oferta/4321',
+            'price' => 1400,
+            'title' => 'Tytul po zmianie',
+        ], $listing), $changeProposal->proposed_payload);
     }
 
     public function test_change_proposal_review_endpoint_is_not_available(): void
@@ -202,23 +209,10 @@ class ReportStoreEndpointTest extends TestCase
 
     private function seedStoreDependencies(): void
     {
-        Platform::factory()->create([
-            'slug' => 'olx',
-            'name' => 'OLX',
-            'base_url' => 'https://olx.pl',
-            'is_active' => true,
-        ]);
-
-        ReportCategory::factory()->create([
-            'slug' => 'fraud',
-            'name' => 'Fraud',
-            'is_active' => true,
-        ]);
-
-        ReportStatus::factory()->create([
-            'slug' => 'new',
-            'name' => 'New',
-            'is_active' => true,
+        $this->seed([
+            PlatformSeeder::class,
+            ReportCategorySeeder::class,
+            ReportStatusSeeder::class,
         ]);
     }
 
@@ -236,7 +230,7 @@ class ReportStoreEndpointTest extends TestCase
         $listing = array_merge([
             'url' => 'https://olx.pl/oferta/default',
             'platform_slug' => 'olx',
-            'report_category_slug' => 'fraud',
+            'report_category_slug' => 'ogolne',
             'external_id' => 'ext-1',
             'title' => 'Tytul listingu',
             'description' => 'Opis listingu dluzszy niz dziesiec znakow.',
@@ -263,5 +257,36 @@ class ReportStoreEndpointTest extends TestCase
             ],
             'attachments' => $attachments,
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function expectedCurrentPayload(Listing $listing): array
+    {
+        return [
+            'platform_id' => $listing->platform_id,
+            'report_category_id' => $listing->report_category_id,
+            'external_id' => $listing->external_id,
+            'url' => $listing->url,
+            'title' => $listing->title,
+            'description' => $listing->description,
+            'price' => $listing->price,
+            'currency' => $listing->currency,
+            'seller_type' => $listing->seller_type,
+            'seller_name' => $listing->seller_name,
+            'location' => $listing->location,
+            'thumbnail_url' => $listing->thumbnail_url,
+            'is_active_external' => $listing->is_active_external,
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed> $listingOverrides
+     * @return array<string, mixed>
+     */
+    private function expectedProposalPayload(array $listingOverrides, Listing $listing): array
+    {
+        return array_merge($this->expectedCurrentPayload($listing), $listingOverrides);
     }
 }

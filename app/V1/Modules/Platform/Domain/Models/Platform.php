@@ -9,6 +9,16 @@ use Database\Factories\PlatformFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property string $id
+ * @property string $name
+ * @property string $slug
+ * @property string $base_url
+ * @property int $order
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 #[UseFactory(PlatformFactory::class)]
 class Platform extends Model
 {
@@ -25,5 +35,4 @@ class Platform extends Model
     protected $casts = [
         'is_active' => 'bool',
     ];
-
 }

@@ -9,6 +9,16 @@ use Database\Factories\ReportCategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property string $id
+ * @property string $slug
+ * @property string $name
+ * @property string|null $description
+ * @property int $order
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 #[UseFactory(ReportCategoryFactory::class)]
 class ReportCategory extends Model
 {
@@ -25,5 +35,4 @@ class ReportCategory extends Model
     protected $casts = [
         'is_active' => 'bool',
     ];
-
 }

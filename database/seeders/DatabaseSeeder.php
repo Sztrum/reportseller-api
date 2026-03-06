@@ -16,7 +16,11 @@ class DatabaseSeeder extends Seeder
 
         if (!app()->environment('production')) {
             $this->call([
+                UserSeeder::class,
                 ListingSeeder::class,
+                ReportSeeder::class,
+                ListingHistorySeeder::class,
+                ListingChangeProposalSeeder::class,
             ]);
         }
     }

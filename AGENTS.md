@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Version
-v1.13.1
+v1.15.0
 
 ## Scope
 This document applies to the entire repository.
@@ -23,6 +23,7 @@ Read documents in this exact order before implementation:
 - Portable/global workflow rules (cross-project): `AGENTS_GLOBAL_WORKFLOW_RULES.md`
 - Portable/global coding rules (cross-project): `AGENTS_GLOBAL_RULES.md`
 - Root repository rules (this file): `AGENTS.md`
+- Project-level cumulative effort log (modules-only scope): `docs/project-effort-estimate.md`
 - Main implementation scope: `app/V1/**`
 - Core shared layer: `app/V1/Core/**`
 - Shared utilities/value objects/migrations: `app/V1/Shared/**`
@@ -52,6 +53,8 @@ Read documents in this exact order before implementation:
 - Whenever a task adds at least one new migration file in `database/migrations`, run `php artisan migrate` in the same task as mandatory verification.
 - For backend/domain changes, run at least focused tests (`php artisan test --filter=...`) or explain why tests were not run.
 - For frontend asset changes (Vite/Tailwind/JS/SCSS), run `npm install` (if deps changed) and `npm run build` at repository root.
+- Maintain cumulative project effort estimation in `docs/project-effort-estimate.md` using only module scope (`app/V1/Modules/**`); explicitly exclude `app/V1/Core/**`, `app/V1/Shared/**`, and shared frontend/assets areas from time calculations.
+- At each commit action, include the current cumulative recommended project effort time from `docs/project-effort-estimate.md` in the commit communication/status update.
 
 ## Documentation workflow (mandatory)
 1. Before coding, read root `AGENTS.md` and all relevant local/module `AGENTS.md` files in touched scope (if present).

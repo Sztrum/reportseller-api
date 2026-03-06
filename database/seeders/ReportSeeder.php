@@ -6,112 +6,53 @@ namespace Database\Seeders;
 
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
-use App\V1\Modules\ReportCatalog\ReportAttachment\Domain\Models\ReportAttachment;
 use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\Models\ReportAuthor;
 use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use Illuminate\Database\Seeder;
+use Random\RandomException;
+use RuntimeException;
 
 final class ReportSeeder extends Seeder
 {
+    /**
+     * @throws RandomException
+     */
     public function run(): void
     {
-        $statuses = ReportStatus::query()
-            ->whereIn('slug', ['new', 'in-progress', 'confirmed', 'rejected', 'duplicate'])
-            ->get()
-            ->keyBy('slug');
+        $listings = Listing::query()->inRandomOrder()->get();
+        $statuses = ReportStatus::query()->get();
 
-        if ($statuses->count() < 5) {
-            $this->call([
-                ReportStatusSeeder::class,
-            ]);
-
-            $statuses = ReportStatus::query()
-                ->whereIn('slug', ['new', 'in-progress', 'confirmed', 'rejected', 'duplicate'])
-                ->get()
-                ->keyBy('slug');
+        if ($listings->isEmpty() || $statuses->isEmpty()) {
+            throw new RuntimeException('ReportSeeder requires seeded listings and report statuses.');
         }
 
-        $listings = Listing::query()->inRandomOrder()->take(18)->get();
-        if ($listings->isEmpty()) {
-            $listings = collect([Listing::factory()->active()->create()]);
-        }
-
-        $authors = ReportAuthor::factory()->count(8)->consented('v1')->create()->values();
-        $blockedAuthors = ReportAuthor::factory()->count(2)->blocked()->create()->values();
-        $allAuthors = $authors->merge($blockedAuthors)->values();
-
-        $statusPool = [
-            ['id' => $statuses['new']->id, 'name' => 'Nowe'],
-            ['id' => $statuses['new']->id, 'name' => 'Nowe'],
-            ['id' => $statuses['in-progress']->id, 'name' => 'W trakcie'],
-            ['id' => $statuses['confirmed']->id, 'name' => 'Potwierdzone'],
-            ['id' => $statuses['rejected']->id, 'name' => 'Odrzucone'],
-            ['id' => $statuses['duplicate']->id, 'name' => 'Duplikat'],
-        ];
-
-        $reasons = [
-            'podejrzenie oszustwa finansowego',
-            'niezgodna cena względem opisu',
-            'podrobione zdjęcia produktu',
-            'sprzedawca unika kontaktu po wpłacie',
-            'oferta wygląda na duplikat z innego portalu',
-            'opis zawiera sprzeczne informacje',
-        ];
-        $moderationNotes = [
-            'Weryfikacja dowodów i historii zmian ogłoszenia.',
-            'Sprawdzono metadane zdjęć oraz spójność opisu.',
-            'Potwierdzono naruszenie regulaminu po analizie zgłoszeń.',
-            'Brak wystarczających podstaw do potwierdzenia naruszenia.',
-            'Scalono z wcześniejszym zgłoszeniem dotyczącym tego samego URL.',
-        ];
-
-        $counter = 1;
         foreach ($listings as $listing) {
-            $reportsPerListing = random_int(1, 3);
-            for ($i = 0; $i < $reportsPerListing; $i++) {
-                $status = $statusPool[array_rand($statusPool)];
-                $reason = $reasons[array_rand($reasons)];
-                $author = $allAuthors->random();
-                $isPublished = $status['name'] === 'Potwierdzone' && random_int(0, 1) === 1;
-                $moderationNote = in_array($status['name'], ['W trakcie', 'Potwierdzone', 'Odrzucone', 'Duplikat'], true)
-                    ? $moderationNotes[array_rand($moderationNotes)]
-                    : null;
-                $title = sprintf('Zgłoszenie #%03d: %s', $counter, ucfirst($reason));
+            $reportsPerListing = random_int(1, 2);
 
-            $report = Report::query()->updateOrCreate(
-                    ['title' => $title],
-                [
+            for ($index = 0; $index < $reportsPerListing; $index++) {
+                $author = ReportAuthor::factory()->create([
+                    'ip_hash' => hash('sha256', fake()->ipv4()),
+                    'consent_version' => 'v1',
+                    'consent_given_at' => fake()->dateTimeBetween('-6 months'),
+                    'is_blocked' => false,
+                    'blocked_at' => null,
+                ]);
+
+                Report::factory()->create([
                     'listing_id' => $listing->id,
-                        'report_status_id' => $status['id'],
-                        'report_author_id' => $author->id,
-                        'description' => sprintf(
-                            'Użytkownik zgłasza ofertę "%s" (%s). Powód: %s. Prośba o moderację wpisu.',
-                            (string) $listing->title,
-                            (string) $listing->url,
-                            $reason
-                        ),
-                        'moderation_note' => $moderationNote,
-                        'is_published' => $isPublished,
-                        'published_at' => $isPublished ? now()->subDays(random_int(0, 3)) : null,
-                ],
-            );
-
-                ReportAttachment::query()->where('report_id', $report->id)->delete();
-
-                $attachmentCount = in_array($status['name'], ['Potwierdzone', 'W trakcie'], true)
-                    ? random_int(1, 3)
-                    : random_int(0, 2);
-
-                if ($attachmentCount > 0) {
-                    ReportAttachment::factory()
-                        ->count($attachmentCount)
-                        ->image()
-                        ->create([
-                            'report_id' => $report->id,
-                        ]);
-                }
-
-                $counter++;
+                    'report_status_id' => $statuses->random()->id,
+                    'report_author_id' => $author->id,
+                    'title' => fake()->sentence(4),
+                    'description' => sprintf(
+                        'Zgloszenie dotyczace oferty "%s" (%s). %s',
+                        $listing->title,
+                        $listing->url,
+                        fake()->paragraph()
+                    ),
+                    'moderation_note' => fake()->boolean(55) ? fake()->sentence() : null,
+                    'is_published' => fake()->boolean(30),
+                    'published_at' => fake()->boolean(30) ? now()->subDays(random_int(0, 5)) : null,
+                ]);
             }
         }
     }

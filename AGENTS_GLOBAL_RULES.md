@@ -1,7 +1,7 @@
 # AGENTS_GLOBAL_RULES.md
 
 ## Version
-v3.0.2
+v3.1.0
 
 ## Scope
 Portable coding/style/implementation standards intended to be reusable across projects.
@@ -81,6 +81,7 @@ Read documents in this exact order before implementation:
 - Prefer multi-line signatures for parameterized methods (except compact handlers like `handle(CommandInterface $command): void`).
 - Separate logical blocks in arrays/method bodies with blank lines for readability.
 - Avoid single-use temporary variables when inline expressions remain readable.
+- In DDD/module code, prefer the simplest readable solution that preserves clear responsibility boundaries; keep each class/method focused on one primary responsibility and avoid mixing orchestration, data seeding, and unrelated domain concerns in the same unit.
 - When removing behavior/config, remove stale related artifacts as part of the same change.
 - Prefer project-specific custom exceptions over framework/default generic exceptions (for example `InvalidArgumentException`) whenever a domain/system-specific failure can be expressed and translated.
 - Prefer `throw_if(...)` over `if (...) { throw ...; }` for guard clauses throwing exceptions.

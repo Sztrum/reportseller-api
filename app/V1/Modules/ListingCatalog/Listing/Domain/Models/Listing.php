@@ -9,10 +9,30 @@ use Database\Factories\ListingFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property string $id
+ * @property string $platform_id
+ * @property string $report_category_id
+ * @property string $external_id
+ * @property string $url
+ * @property string $title
+ * @property string $description
+ * @property int|null $price
+ * @property string|null $currency
+ * @property string|null $seller_type
+ * @property string|null $seller_name
+ * @property string|null $location
+ * @property string|null $thumbnail_url
+ * @property bool $is_active_external
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 #[UseFactory(ListingFactory::class)]
 class Listing extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'platform_id',
         'report_category_id',
