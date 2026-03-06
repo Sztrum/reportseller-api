@@ -9,7 +9,7 @@ use App\V1\Core\Domain\Exceptions\DomainException;
 class ReportStatusNotFoundException extends DomainException
 {
     /**
-     * @see app/V1/Modules/ReportCatalog/ReportStatus/Translations/pl/exceptions.php
+     * @see app/V1/Modules/ReportCatalog/ReportStatus/Application/Translations/pl/exceptions.php
      */
     private const DEFAULT_MESSAGE_KEY = 'report-status::exceptions.other.status_not_found';
 
