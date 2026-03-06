@@ -18,6 +18,7 @@ use App\V1\Modules\ReportCatalog\ReportAttachment\Infrastructure\Repositories\Re
 use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\ReportAuthorRepository;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
+use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Aggregates\ReportStatusAggregate;
 use App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories\ReportStatusRepository;
 use Throwable;
 
@@ -26,6 +27,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
     public function __construct(
         private PlatformAggregate $platformAggregate,
         private ReportCategoryAggregate $reportCategoryAggregate,
+        private ReportStatusAggregate $reportStatusAggregate,
         private ReportCategoryRepository $reportCategoryRepository,
         private ListingRepository $listingRepository,
         private ListingChangeProposalDiffService $listingChangeProposalDiffService,
@@ -61,7 +63,10 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             );
         }
         if ($listing === null) {
-            $listing = $this->listingRepository->firstByUrl($command->listingDTO->url);
+            $listing = $this->listingRepository->firstByPlatformAndUrl(
+                $platform->id,
+                $command->listingDTO->url
+            );
         }
 
         $listingPayload = [
@@ -86,7 +91,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         }
 
         $reportStatus = $this->reportStatusRepository->firstBySlug('new');
-        assert($reportStatus !== null);
+        $this->reportStatusAggregate->ensureReportStatusExists($reportStatus, 'new');
 
         $author = $this->reportAuthorRepository->create([
             'ip_hash' => null,
