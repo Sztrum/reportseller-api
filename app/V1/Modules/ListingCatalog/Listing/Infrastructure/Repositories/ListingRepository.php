@@ -53,4 +53,17 @@ class ListingRepository extends EloquentModelRepository
 
         return $listing;
     }
+
+    public function firstByPlatformAndUrl(
+        string $platformId,
+        string $url
+    ): ?Listing {
+        /** @var Listing|null $listing */
+        $listing = $this->query()
+            ->where('platform_id', $platformId)
+            ->where('url', $url)
+            ->first();
+
+        return $listing;
+    }
 }

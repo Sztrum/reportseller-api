@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
+use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use Database\Seeders\PlatformSeeder;
 use Database\Seeders\ReportCategorySeeder;
 use Database\Seeders\ReportStatusSeeder;
@@ -77,6 +78,38 @@ class ReportStoreEndpointTest extends TestCase
         $this->assertDatabaseCount('listing_histories', 0);
         $this->assertDatabaseCount('listing_change_proposals', 0);
         $this->assertDatabaseCount('reports', 2);
+    }
+
+    public function test_it_falls_back_to_existing_listing_lookup_by_url_when_external_id_changes(): void
+    {
+        $this->seedStoreDependencies();
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: [
+                'external_id' => 'ext-1',
+                'url' => 'https://olx.pl/oferta/fallback-url',
+            ]
+        ))->assertOk();
+
+        $response = $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: [
+                'external_id' => 'ext-2',
+                'url' => 'https://olx.pl/oferta/fallback-url',
+            ],
+            reportOverrides: [
+                'title' => 'Raport z nowym external id',
+                'description' => 'Drugie zgloszenie powinno trafic do tego samego listingu po URL.',
+            ]
+        ));
+
+        $response->assertOk();
+
+        $this->assertDatabaseCount('listings', 1);
+        $this->assertDatabaseCount('reports', 2);
+        $this->assertDatabaseHas('listings', [
+            'external_id' => 'ext-1',
+            'url' => 'https://olx.pl/oferta/fallback-url',
+        ]);
     }
 
     public function test_it_creates_pending_change_proposal_when_existing_listing_data_changes(): void
@@ -205,6 +238,27 @@ class ReportStoreEndpointTest extends TestCase
             'reviewed_by' => 'moderator@example.com',
             'review_reason' => 'Potwierdzono wiarygodnosc zmiany.',
         ])->assertNotFound();
+    }
+
+    public function test_it_returns_domain_error_when_default_new_report_status_is_missing(): void
+    {
+        $this->seed([
+            PlatformSeeder::class,
+            ReportCategorySeeder::class,
+        ]);
+
+        ReportStatus::query()->delete();
+
+        $response = $this->postJson(route('api.reports.store'), $this->buildPayload());
+
+        $response
+            ->assertStatus(422)
+            ->assertJson([
+                'status' => 422,
+                'message' => 'Status raportu o slug "new" nie zostal znaleziony.',
+            ]);
+
+        $this->assertDatabaseCount('reports', 0);
     }
 
     private function seedStoreDependencies(): void
