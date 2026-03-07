@@ -29,7 +29,6 @@ final class ListingChangeProposalSeeder extends Seeder
 
             ListingChangeProposal::factory()->create([
                 'listing_id' => $listing->id,
-                'report_id' => $report->id,
                 'current_payload' => [
                     'platform_id' => $listing->platform_id,
                     'report_category_id' => $listing->report_category_id,

@@ -143,7 +143,6 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
 
         $this->listingChangeProposalRepository->create([
             'listing_id' => $listing->id,
-            'report_id' => $report->id,
             'status' => ListingChangeProposal::STATUS_PENDING,
             'current_payload' => $currentPayload,
             'proposed_payload' => $listingPayload,
