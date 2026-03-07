@@ -7,7 +7,7 @@ Track cumulative recommended human development effort for the whole project usin
 - Date: 2026-03-03
 - Scope snapshot: `app/V1/Modules/**` (172 files, ~7,197 LOC in PHP/TS/JS/Blade/MD)
 - Estimated effort delta added: 150 h - 250 h
-- Running total: 151 h 30 min - 253 h
+- Running total: 154 h 30 min - 258 h
 
 ## Update Rule
 - On each new task, add a new `Entry` with estimated task delta (`X h Y min - A h B min`) and update `Running total`.
@@ -20,3 +20,6 @@ Track cumulative recommended human development effort for the whole project usin
 2. 2026-03-06: report store hardens default `new` status resolution with domain validation and narrows listing URL fallback lookup to the resolved platform context.
    - Estimated effort delta added: 1 h 30 min - 3 h
    - Running total: 151 h 30 min - 253 h
+3. 2026-03-07: report store improvements added model `belongsTo` relations, enforced seller type enum usage, and removed attachment persistence from the report store flow.
+   - Estimated effort delta added: 3 h - 5 h
+   - Running total: 154 h 30 min - 258 h

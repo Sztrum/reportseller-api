@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\V1\Modules\ListingCatalog\ListingHistory\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use Database\Factories\ListingHistoryFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
@@ -18,7 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $description
  * @property int|null $price
  * @property string|null $currency
- * @property string|null $seller_type
+ * @property ListingSellerTypeEnum|null $seller_type
  * @property string|null $seller_name
  * @property string|null $location
  * @property string|null $thumbnail_url
@@ -51,7 +54,13 @@ class ListingHistory extends Model
 
     protected $casts = [
         'price' => 'integer',
+        'seller_type' => ListingSellerTypeEnum::class,
         'is_active_external' => 'bool',
         'captured_at' => 'datetime',
     ];
+
+    public function listing(): BelongsTo
+    {
+        return $this->belongsTo(Listing::class, 'listing_id');
+    }
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\V1\Modules\ReportCatalog\ReportAttachment\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
+use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
@@ -38,4 +40,9 @@ class ReportAttachment extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function report(): BelongsTo
+    {
+        return $this->belongsTo(Report::class, 'report_id');
+    }
 }

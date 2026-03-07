@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingHistory\Domain\Models\ListingHistory;
 use Illuminate\Database\Seeder;
@@ -38,7 +39,7 @@ final class ListingHistorySeeder extends Seeder
                         ? random_int(500, 20_000)
                         : max(1, $listing->price + random_int(-300, 300)),
                     'currency' => $listing->currency ?? 'PLN',
-                    'seller_type' => $listing->seller_type ?? fake()->randomElement(['private', 'business']),
+                    'seller_type' => $listing->seller_type?->value ?? fake()->randomElement(ListingSellerTypeEnum::values()),
                     'seller_name' => $listing->seller_name ?? fake()->name(),
                     'location' => $listing->location ?? fake()->city(),
                     'thumbnail_url' => $listing->thumbnail_url ?? fake()->imageUrl(),

@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
+use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 use Database\Factories\ListingChangeProposalFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
@@ -51,4 +54,14 @@ class ListingChangeProposal extends Model
         'requested_at' => 'datetime',
         'reviewed_at' => 'datetime',
     ];
+
+    public function listing(): BelongsTo
+    {
+        return $this->belongsTo(Listing::class, 'listing_id');
+    }
+
+    public function report(): BelongsTo
+    {
+        return $this->belongsTo(Report::class, 'report_id');
+    }
 }

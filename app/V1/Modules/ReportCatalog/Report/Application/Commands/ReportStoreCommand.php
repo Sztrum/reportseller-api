@@ -7,7 +7,6 @@ namespace App\V1\Modules\ReportCatalog\Report\Application\Commands;
 use App\V1\Core\Application\Command\CommandTransactionalInterface;
 use App\V1\Modules\ListingCatalog\Listing\Domain\DTO\ListingDTO;
 use App\V1\Modules\ReportCatalog\Report\Domain\DTO\ReportDTO;
-use App\V1\Modules\ReportCatalog\ReportAttachment\Domain\DTO\AttachmentsDTO;
 use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\DTO\AuthorDTO;
 
 final readonly class ReportStoreCommand implements CommandTransactionalInterface
@@ -16,6 +15,5 @@ final readonly class ReportStoreCommand implements CommandTransactionalInterface
         public ListingDTO $listingDTO,
         public ReportDTO $reportDTO,
         public AuthorDTO $authorDTO,
-        public AttachmentsDTO $attachmentsDTO
     ) {}
 }

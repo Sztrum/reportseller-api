@@ -14,7 +14,6 @@ use App\V1\Modules\Platform\Domain\Aggregates\PlatformAggregate;
 use App\V1\Modules\Platform\Infrastructure\Repositories\PlatformRepository;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
 use App\V1\Modules\ReportCatalog\Report\Infrastructure\Repositories\ReportRepository;
-use App\V1\Modules\ReportCatalog\ReportAttachment\Infrastructure\Repositories\ReportAttachmentRepository;
 use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\ReportAuthorRepository;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
@@ -36,7 +35,6 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         private ReportStatusRepository $reportStatusRepository,
         private ReportRepository $reportRepository,
         private ReportAuthorRepository $reportAuthorRepository,
-        private ReportAttachmentRepository $reportAttachmentRepository,
     ) {
     }
 
@@ -78,7 +76,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'description' => $command->listingDTO->description,
             'price' => $command->listingDTO->price,
             'currency' => $command->listingDTO->currency,
-            'seller_type' => $command->listingDTO->seller_type,
+            'seller_type' => $command->listingDTO->seller_type?->value,
             'seller_name' => $command->listingDTO->seller_name,
             'location' => $command->listingDTO->location,
             'thumbnail_url' => $command->listingDTO->thumbnail_url,
@@ -112,17 +110,6 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'published_at' => null,
         ]);
 
-        foreach ($command->attachmentsDTO->items as $attachment) {
-            $this->reportAttachmentRepository->create([
-                'report_id' => $report->id,
-                'storage_disk' => $attachment->storage_disk,
-                'storage_key' => $attachment->storage_key,
-                'original_name' => $attachment->original_name,
-                'mime_type' => $attachment->mime_type,
-                'size_bytes' => $attachment->size_bytes,
-            ]);
-        }
-
         $latestPendingProposal = $this->listingChangeProposalRepository->latestPendingForListing($listing->id);
         $shouldCreateProposal = $this->listingChangeProposalDiffService->hasListingPayloadChanges($listing, $listingPayload);
         $hasDuplicatePendingProposal = false;
@@ -146,7 +133,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'description' => $listing->description,
             'price' => $listing->price,
             'currency' => $listing->currency,
-            'seller_type' => $listing->seller_type,
+            'seller_type' => $listing->seller_type?->value,
             'seller_name' => $listing->seller_name,
             'location' => $listing->location,
             'thumbnail_url' => $listing->thumbnail_url,
