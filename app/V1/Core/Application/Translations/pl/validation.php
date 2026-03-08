@@ -120,6 +120,7 @@ return [
 
     'throttle' => 'Zbyt wiele prób. Spróbuj ponownie za chwilę.',
     'invalid_data' => 'Nieprawidłowe dane.',
+    'name_required_in_one_language' => 'Pole "name" musi być wypełnione w co najmniej jednym języku.',
 
     'password' => [
         'uppercase' => 'Hasło musi mieć co najmniej 8 znaków i zawierać przynajmniej 1 wielką literę.',

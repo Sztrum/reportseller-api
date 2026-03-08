@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
+import pl from "../translations/pl";
 
 const requestLimit = 10;
 let requestCount = 0;
@@ -20,7 +21,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     function (config) {
         if (requestCount >= requestLimit) {
-            return Promise.reject(new Error("Osiągnięto limit " + requestLimit + " żądań na minutę. Spróbuj ponownie za chwilę."));
+            return Promise.reject(new Error(pl.validation.rateLimitExceeded(requestLimit)));
         }
 
         requestCount++;
@@ -45,5 +46,3 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
-export default axiosInstance;

@@ -155,7 +155,10 @@ readonly class CountryEntity implements Arrayable, JsonSerializable, Jsonable
     private static function stringValue(array $data, string $key): string
     {
         $value = $data[$key] ?? null;
-        throw_if(!is_string($value), new \InvalidArgumentException(sprintf('Invalid "%s" country value.', $key)));
+        throw_if(
+            !is_string($value),
+            new \InvalidArgumentException(__('countries::exceptions.other.invalid_country_value', ['key' => $key]))
+        );
 
         return $value;
     }
@@ -169,7 +172,10 @@ readonly class CountryEntity implements Arrayable, JsonSerializable, Jsonable
     private static function stringListValue(array $data, string $key): array
     {
         $value = $data[$key] ?? null;
-        throw_if(!is_array($value), new \InvalidArgumentException(sprintf('Invalid "%s" country value.', $key)));
+        throw_if(
+            !is_array($value),
+            new \InvalidArgumentException(__('countries::exceptions.other.invalid_country_value', ['key' => $key]))
+        );
 
         return array_values(array_filter($value, static fn (mixed $item): bool => is_string($item)));
     }

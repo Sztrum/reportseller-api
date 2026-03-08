@@ -48,7 +48,7 @@ abstract class DashboardRouteServiceProvider extends RouteServiceProvider
             })->first();
 
         if (!$provider instanceof ModuleServiceProvider) {
-            throw new \RuntimeException('Cannot resolve module provider for dashboard routes.');
+            throw new \RuntimeException(__('core::domain.dashboard_route_module_provider_not_resolved'));
         }
 
         return $provider;

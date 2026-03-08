@@ -48,7 +48,7 @@ abstract class FrontendRouteServiceProvider extends RouteServiceProvider
             })->first();
 
         if (!$provider instanceof ModuleServiceProvider) {
-            throw new \RuntimeException('Cannot resolve module provider for frontend routes.');
+            throw new \RuntimeException(__('core::domain.frontend_route_module_provider_not_resolved'));
         }
 
         return $provider;
