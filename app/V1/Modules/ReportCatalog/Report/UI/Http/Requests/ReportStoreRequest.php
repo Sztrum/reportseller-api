@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\V1\Modules\ReportCatalog\Report\UI\Http\Requests;
 
+use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Shared\UI\Http\Requests\BaseRequest;
+use Illuminate\Validation\Rule;
 
 class ReportStoreRequest extends BaseRequest
 {
     /**
-     * @return array<string, array<int, string>>
+     * @return array<string, array<int, string|\Illuminate\Contracts\Validation\ValidationRule|\Illuminate\Validation\Rules\In>>
      */
     public function rules(): array
     {
@@ -25,7 +27,7 @@ class ReportStoreRequest extends BaseRequest
             'listing.description' => ['nullable', 'string', 'max:5000'],
             'listing.price' => ['nullable', 'integer', 'min:0', 'max:999999999999'],
             'listing.currency' => ['nullable', 'string', 'size:3'],
-            'listing.seller_type' => ['nullable', 'in:private,business'],
+            'listing.seller_type' => ['nullable', Rule::in(ListingSellerTypeEnum::values())],
             'listing.seller_name' => ['nullable', 'string', 'max:255'],
             'listing.location' => ['nullable', 'string', 'max:191'],
             'listing.thumbnail_url' => ['nullable', 'string', 'max:2048', 'url'],
@@ -38,13 +40,6 @@ class ReportStoreRequest extends BaseRequest
             'author' => ['nullable', 'array'],
             'author.consent_version' => ['nullable', 'string', 'max:50'],
             'author.consent_given_at' => ['nullable', 'date'],
-
-            'attachments' => ['nullable', 'array', 'max:10'],
-            'attachments.*.storage_key' => ['required_with:attachments', 'string', 'max:1024'],
-            'attachments.*.storage_disk' => ['nullable', 'string', 'max:50'],
-            'attachments.*.original_name' => ['nullable', 'string', 'max:255'],
-            'attachments.*.mime_type' => ['nullable', 'string', 'max:100'],
-            'attachments.*.size_bytes' => ['nullable', 'integer', 'min:1', 'max:50000000'],
         ];
     }
 

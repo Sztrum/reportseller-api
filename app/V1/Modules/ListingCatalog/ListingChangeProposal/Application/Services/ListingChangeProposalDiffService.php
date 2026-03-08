@@ -24,7 +24,7 @@ class ListingChangeProposalDiffService
             'description' => $listing->description,
             'price' => $listing->price,
             'currency' => $listing->currency,
-            'seller_type' => $listing->seller_type,
+            'seller_type' => $listing->seller_type?->value,
             'seller_name' => $listing->seller_name,
             'location' => $listing->location,
             'thumbnail_url' => $listing->thumbnail_url,

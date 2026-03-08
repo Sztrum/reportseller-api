@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\Platform\Domain\Models\Platform;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models\ReportCategory;
@@ -32,7 +33,7 @@ final class ListingFactory extends Factory
         $title = $this->faker->randomElement($prefixes) . ' ' . $this->faker->numberBetween(2015, 2026);
         $city = $this->faker->randomElement($cities);
         $slug = Str::slug($title . '-' . $city . '-' . $this->faker->unique()->numberBetween(1, 999999));
-        $sellerType = $this->faker->randomElement(['private', 'business']);
+        $sellerType = $this->faker->randomElement(ListingSellerTypeEnum::cases());
         $isActiveExternal = $this->faker->boolean(88);
 
         return [
@@ -45,7 +46,7 @@ final class ListingFactory extends Factory
             'price' => $this->faker->numberBetween(600, 150000),
             'currency' => 'PLN',
             'seller_type' => $sellerType,
-            'seller_name' => $sellerType === 'private' ? $this->faker->name() : $this->faker->company(),
+            'seller_name' => $sellerType === ListingSellerTypeEnum::PRIVATE ? $this->faker->name() : $this->faker->company(),
             'location' => $city,
             'thumbnail_url' => 'https://picsum.photos/seed/' . $this->faker->unique()->slug(2) . '/640/480',
             'is_active_external' => $isActiveExternal,
