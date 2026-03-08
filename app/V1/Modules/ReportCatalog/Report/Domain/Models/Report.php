@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\V1\Modules\ReportCatalog\Report\Domain\Models;
 
 use App\V1\Core\Domain\Models\Model;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
+use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\Models\ReportAuthor;
+use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use Database\Factories\ReportFactory;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -45,4 +49,19 @@ class Report extends Model
         'is_published' => 'bool',
         'published_at' => 'datetime',
     ];
+
+    public function listing(): BelongsTo
+    {
+        return $this->belongsTo(Listing::class, 'listing_id');
+    }
+
+    public function reportStatus(): BelongsTo
+    {
+        return $this->belongsTo(ReportStatus::class, 'report_status_id');
+    }
+
+    public function reportAuthor(): BelongsTo
+    {
+        return $this->belongsTo(ReportAuthor::class, 'report_author_id');
+    }
 }

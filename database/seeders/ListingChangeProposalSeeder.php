@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
@@ -28,7 +29,6 @@ final class ListingChangeProposalSeeder extends Seeder
 
             ListingChangeProposal::factory()->create([
                 'listing_id' => $listing->id,
-                'report_id' => $report->id,
                 'current_payload' => [
                     'platform_id' => $listing->platform_id,
                     'report_category_id' => $listing->report_category_id,
@@ -38,7 +38,7 @@ final class ListingChangeProposalSeeder extends Seeder
                     'description' => $listing->description,
                     'price' => $listing->price,
                     'currency' => $listing->currency,
-                    'seller_type' => $listing->seller_type,
+                    'seller_type' => $listing->seller_type?->value,
                     'seller_name' => $listing->seller_name,
                     'location' => $listing->location,
                     'thumbnail_url' => $listing->thumbnail_url,
@@ -53,7 +53,7 @@ final class ListingChangeProposalSeeder extends Seeder
                     'description' => fake()->paragraph(),
                     'price' => ($listing->price ?? random_int(500, 10_000)) + random_int(50, 900),
                     'currency' => $listing->currency ?? 'PLN',
-                    'seller_type' => $listing->seller_type ?? fake()->randomElement(['private', 'business']),
+                    'seller_type' => $listing->seller_type?->value ?? fake()->randomElement(ListingSellerTypeEnum::values()),
                     'seller_name' => fake()->name(),
                     'location' => fake()->city(),
                     'thumbnail_url' => fake()->imageUrl(),

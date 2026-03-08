@@ -35,7 +35,7 @@ readonly class ListingHistorySnapshotService
             'description' => $listingDTO->description,
             'price' => $listingDTO->price,
             'currency' => $listingDTO->currency,
-            'seller_type' => $listingDTO->seller_type,
+            'seller_type' => $listingDTO->seller_type?->value,
             'seller_name' => $listingDTO->seller_name,
             'location' => $listingDTO->location,
             'thumbnail_url' => $listingDTO->thumbnail_url,
@@ -77,7 +77,12 @@ readonly class ListingHistorySnapshotService
         ];
 
         foreach ($fieldsToCompare as $field) {
-            if ($lastSnapshot->getAttribute($field) != $snapshot[$field]) {
+            $lastSnapshotValue = $lastSnapshot->getAttribute($field);
+            if ($field === 'seller_type' && $lastSnapshotValue !== null) {
+                $lastSnapshotValue = $lastSnapshotValue?->value;
+            }
+
+            if ($lastSnapshotValue != $snapshot[$field]) {
                 return true;
             }
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\V1\Modules\ListingCatalog\Listing\Domain\DTO;
 
+use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use Spatie\LaravelData\Data;
 
 final class ListingDTO extends Data
@@ -17,7 +18,7 @@ final class ListingDTO extends Data
         public ?string $description,
         public ?int $price,
         public ?string $currency,
-        public ?string $seller_type,
+        public ?ListingSellerTypeEnum $seller_type,
         public ?string $seller_name,
         public ?string $location,
         public ?string $thumbnail_url,

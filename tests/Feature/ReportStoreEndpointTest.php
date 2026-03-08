@@ -27,13 +27,6 @@ class ReportStoreEndpointTest extends TestCase
                 'title' => 'Podejrzane ogloszenie',
                 'description' => 'Opis ma wiecej niz dziesiec znakow i jest poprawny.',
             ],
-            attachments: [[
-                'storage_key' => 'reports/2026/02/file-1.jpg',
-                'storage_disk' => 's3',
-                'original_name' => 'file-1.jpg',
-                'mime_type' => 'image/jpeg',
-                'size_bytes' => 2048,
-            ]]
         );
 
         $response = $this->postJson(route('api.reports.store'), $payload);
@@ -51,7 +44,7 @@ class ReportStoreEndpointTest extends TestCase
             'description' => 'Opis ma wiecej niz dziesiec znakow i jest poprawny.',
         ]);
         $this->assertDatabaseCount('report_authors', 1);
-        $this->assertDatabaseCount('report_attachments', 1);
+        $this->assertDatabaseCount('report_attachments', 0);
     }
 
     public function test_it_does_not_create_change_proposal_when_listing_data_is_unchanged(): void
@@ -273,13 +266,11 @@ class ReportStoreEndpointTest extends TestCase
     /**
      * @param array<string, mixed> $listingOverrides
      * @param array<string, mixed> $reportOverrides
-     * @param array<int, array<string, mixed>> $attachments
      * @return array<string, mixed>
      */
     private function buildPayload(
         array $listingOverrides = [],
         array $reportOverrides = [],
-        array $attachments = [],
     ): array {
         $listing = array_merge([
             'url' => 'https://olx.pl/oferta/default',
@@ -309,7 +300,6 @@ class ReportStoreEndpointTest extends TestCase
                 'consent_version' => 'v1',
                 'consent_given_at' => now()->toISOString(),
             ],
-            'attachments' => $attachments,
         ];
     }
 
@@ -327,7 +317,7 @@ class ReportStoreEndpointTest extends TestCase
             'description' => $listing->description,
             'price' => $listing->price,
             'currency' => $listing->currency,
-            'seller_type' => $listing->seller_type,
+            'seller_type' => $listing->seller_type?->value,
             'seller_name' => $listing->seller_name,
             'location' => $listing->location,
             'thumbnail_url' => $listing->thumbnail_url,

@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
-use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,7 +24,6 @@ final class ListingChangeProposalFactory extends Factory
 
         return [
             'listing_id' => Listing::factory(),
-            'report_id' => Report::factory(),
             'status' => $status,
             'current_payload' => [],
             'proposed_payload' => [],
