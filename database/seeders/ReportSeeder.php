@@ -31,7 +31,7 @@ final class ReportSeeder extends Seeder
 
             for ($index = 0; $index < $reportsPerListing; $index++) {
                 $author = ReportAuthor::factory()->create([
-                    'ip_hash' => hash('sha256', fake()->ipv4()),
+                    'email' => fake()->unique()->safeEmail(),
                     'consent_version' => 'v1',
                     'consent_given_at' => fake()->dateTimeBetween('-6 months'),
                     'is_blocked' => false,

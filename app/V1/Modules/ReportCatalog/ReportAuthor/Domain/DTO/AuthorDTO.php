@@ -9,6 +9,7 @@ use Spatie\LaravelData\Data;
 final class AuthorDTO extends Data
 {
     public function __construct(
+        public ?string $email,
         public ?string $consent_version,
         public ?string $consent_given_at,
     ) {

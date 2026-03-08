@@ -13,7 +13,7 @@ return new class extends AbstractCreateTableMigration
         Schema::create($this->table_name, static function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            $table->char('ip_hash', 64)->nullable();
+            $table->string('email', 255)->nullable()->unique();
             $table->string('consent_version', 50)->nullable();
             $table->timestamp('consent_given_at')->nullable();
 
@@ -22,7 +22,7 @@ return new class extends AbstractCreateTableMigration
 
             $table->timestamps();
 
-            $table->index(['is_blocked', 'ip_hash']);
+            $table->index(['is_blocked', 'email']);
         });
     }
 };

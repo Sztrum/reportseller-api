@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property string $id
- * @property string $ip_hash
- * @property string $consent_version
- * @property \Illuminate\Support\Carbon $consent_given_at
+ * @property string|null $email
+ * @property string|null $consent_version
+ * @property \Illuminate\Support\Carbon|null $consent_given_at
  * @property bool $is_blocked
  * @property \Illuminate\Support\Carbon|null $blocked_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -26,7 +26,7 @@ class ReportAuthor extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ip_hash',
+        'email',
         'consent_version',
         'consent_given_at',
         'is_blocked',
@@ -40,7 +40,7 @@ class ReportAuthor extends Model
     ];
 
     protected $hidden = [
-        'ip_hash',
+        'email',
         'consent_version',
         'consent_given_at',
         'blocked_at',

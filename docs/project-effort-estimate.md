@@ -7,7 +7,7 @@ Track cumulative recommended human development effort for the whole project usin
 - Date: 2026-03-03
 - Scope snapshot: `app/V1/Modules/**` (172 files, ~7,197 LOC in PHP/TS/JS/Blade/MD)
 - Estimated effort delta added: 150 h - 250 h
-- Running total: 156 h - 260 h
+- Running total: 157 h 30 min - 262 h
 
 ## Update Rule
 - On each new task, add a new `Entry` with estimated task delta (`X h Y min - A h B min`) and update `Running total`.
@@ -26,3 +26,6 @@ Track cumulative recommended human development effort for the whole project usin
 4. 2026-03-07: listing change proposals were decoupled from reports by removing `report_id` and keeping proposals keyed only by listing context.
    - Estimated effort delta added: 1 h 30 min - 2 h
    - Running total: 156 h - 260 h
+5. 2026-03-08: anonymous report authors were changed from IP-based storage to optional email-based reuse, allowing repeated emails to link new reports to an existing author record.
+   - Estimated effort delta added: 1 h 30 min - 2 h
+   - Running total: 157 h 30 min - 262 h
