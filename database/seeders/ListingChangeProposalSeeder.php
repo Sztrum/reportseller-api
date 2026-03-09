@@ -8,6 +8,7 @@ use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
+use Database\Factories\ListingChangeProposalFactory;
 use Illuminate\Database\Seeder;
 use Random\RandomException;
 use RuntimeException;
@@ -25,9 +26,12 @@ final class ListingChangeProposalSeeder extends Seeder
         $reports->each(/**
          * @throws RandomException
          */ function (Report $report): void {
+            /** @var Listing $listing */
             $listing = Listing::query()->findOrFail($report->listing_id);
+            /** @var ListingChangeProposalFactory $listingChangeProposalFactory */
+            $listingChangeProposalFactory = ListingChangeProposal::factory();
 
-            ListingChangeProposal::factory()->create([
+            $listingChangeProposalFactory->create([
                 'listing_id' => $listing->id,
                 'current_payload' => [
                     'platform_id' => $listing->platform_id,
@@ -53,7 +57,7 @@ final class ListingChangeProposalSeeder extends Seeder
                     'description' => fake()->paragraph(),
                     'price' => ($listing->price ?? random_int(500, 10_000)) + random_int(50, 900),
                     'currency' => $listing->currency ?? 'PLN',
-                    'seller_type' => $listing->seller_type?->value ?? fake()->randomElement(ListingSellerTypeEnum::values()),
+                    'seller_type' => $listing->seller_type !== null ? $listing->seller_type->value : fake()->randomElement(ListingSellerTypeEnum::values()),
                     'seller_name' => fake()->name(),
                     'location' => fake()->city(),
                     'thumbnail_url' => fake()->imageUrl(),

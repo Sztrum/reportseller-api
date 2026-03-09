@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 #[UseFactory(ListingFactory::class)]
 class Listing extends Model
 {
+    /** @use HasFactory<ListingFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -61,11 +62,17 @@ class Listing extends Model
         'is_active' => 'bool',
     ];
 
+    /**
+     * @return BelongsTo<Platform, $this>
+     */
     public function platform(): BelongsTo
     {
         return $this->belongsTo(Platform::class, 'platform_id');
     }
 
+    /**
+     * @return BelongsTo<ReportCategory, $this>
+     */
     public function reportCategory(): BelongsTo
     {
         return $this->belongsTo(ReportCategory::class, 'report_category_id');

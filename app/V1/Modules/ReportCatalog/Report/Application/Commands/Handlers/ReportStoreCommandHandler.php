@@ -6,6 +6,7 @@ namespace App\V1\Modules\ReportCatalog\Report\Application\Commands\Handlers;
 
 use App\V1\Core\Application\Command\CommandHandlerInterface;
 use App\V1\Core\Application\Command\CommandInterface;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\Listing\Infrastructure\Repositories\ListingRepository;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Application\Services\ListingChangeProposalDiffService;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
@@ -57,6 +58,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         $category = $this->reportCategoryRepository->firstBySlug($command->listingDTO->report_category_slug);
         $this->reportCategoryAggregate->ensureReportCategoryExists($category);
 
+        /** @var Listing|null $listing */
         $listing = null;
         if ($command->listingDTO->external_id !== null) {
             $listing = $this->listingRepository->firstByExternalIdAndPlatform(
@@ -89,6 +91,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         ksort($listingPayload);
 
         if ($listing === null) {
+            /** @var Listing $listing */
             $listing = $this->listingRepository->create($listingPayload);
         }
 

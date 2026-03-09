@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 #[UseFactory(ReportCategoryFactory::class)]
 class ReportCategory extends Model
 {
+    /** @use HasFactory<ReportCategoryFactory> */
     use HasFactory;
 
     protected $fillable = [
