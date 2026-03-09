@@ -11,6 +11,7 @@ use Throwable;
 readonly class ReportStatusAggregate
 {
     /**
+     * @phpstan-assert !null $reportStatus
      * @throws ReportStatusNotFoundException|Throwable
      */
     public function ensureReportStatusExists(

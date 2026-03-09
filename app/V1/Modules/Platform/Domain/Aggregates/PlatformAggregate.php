@@ -11,6 +11,7 @@ use Throwable;
 readonly class PlatformAggregate
 {
     /**
+     * @phpstan-assert !null $platform
      * @throws PlatformNotFoundException|Throwable
      */
     public function ensurePlatformExists(

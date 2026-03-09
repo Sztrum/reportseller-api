@@ -6,6 +6,8 @@ namespace Tests\Feature;
 
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
+use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
+use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\Models\ReportAuthor;
 use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use Database\Seeders\PlatformSeeder;
 use Database\Seeders\ReportCategorySeeder;
@@ -44,7 +46,41 @@ class ReportStoreEndpointTest extends TestCase
             'description' => 'Opis ma wiecej niz dziesiec znakow i jest poprawny.',
         ]);
         $this->assertDatabaseCount('report_authors', 1);
+
+        $report = Report::query()->first();
+        $author = ReportAuthor::query()->first();
+        $this->assertNotNull($report);
+        $this->assertNotNull($author);
+        $this->assertSame($author->id, $report->report_author_id);
+
         $this->assertDatabaseCount('report_attachments', 0);
+    }
+
+    public function test_it_reuses_existing_author_when_email_repeats(): void
+    {
+        $this->seedStoreDependencies();
+
+        $email = 'reporter@example.com';
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: ['url' => 'https://olx.pl/oferta/email-1'],
+            authorOverrides: ['email' => strtoupper($email)],
+        ))->assertOk();
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: ['url' => 'https://olx.pl/oferta/email-2'],
+            reportOverrides: [
+                'title' => 'Drugie zgloszenie z tym samym emailem',
+                'description' => 'Drugie zgloszenie powinno wykorzystac tego samego autora.',
+            ],
+            authorOverrides: ['email' => $email],
+        ))->assertOk();
+
+        $this->assertDatabaseCount('reports', 2);
+        $this->assertDatabaseCount('report_authors', 1);
+        $this->assertDatabaseHas('report_authors', [
+            'email' => $email,
+        ]);
     }
 
     public function test_it_does_not_create_change_proposal_when_listing_data_is_unchanged(): void
@@ -266,11 +302,13 @@ class ReportStoreEndpointTest extends TestCase
     /**
      * @param array<string, mixed> $listingOverrides
      * @param array<string, mixed> $reportOverrides
+     * @param array<string, mixed> $authorOverrides
      * @return array<string, mixed>
      */
     private function buildPayload(
         array $listingOverrides = [],
         array $reportOverrides = [],
+        array $authorOverrides = [],
     ): array {
         $listing = array_merge([
             'url' => 'https://olx.pl/oferta/default',
@@ -293,13 +331,16 @@ class ReportStoreEndpointTest extends TestCase
             'description' => 'To zgloszenie zawiera poprawny i wystarczajaco dlugi opis.',
         ], $reportOverrides);
 
+        $author = array_merge([
+            'email' => null,
+            'consent_version' => 'v1',
+            'consent_given_at' => now()->toISOString(),
+        ], $authorOverrides);
+
         return [
             'listing' => $listing,
             'report' => $report,
-            'author' => [
-                'consent_version' => 'v1',
-                'consent_given_at' => now()->toISOString(),
-            ],
+            'author' => $author,
         ];
     }
 

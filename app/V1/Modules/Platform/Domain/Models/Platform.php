@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 #[UseFactory(PlatformFactory::class)]
 class Platform extends Model
 {
+    /** @use HasFactory<PlatformFactory> */
     use HasFactory;
 
     protected $fillable = [

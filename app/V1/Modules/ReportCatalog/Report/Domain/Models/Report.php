@@ -50,16 +50,25 @@ class Report extends Model
         'published_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<Listing, $this>
+     */
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class, 'listing_id');
     }
 
+    /**
+     * @return BelongsTo<ReportStatus, $this>
+     */
     public function reportStatus(): BelongsTo
     {
         return $this->belongsTo(ReportStatus::class, 'report_status_id');
     }
 
+    /**
+     * @return BelongsTo<ReportAuthor, $this>
+     */
     public function reportAuthor(): BelongsTo
     {
         return $this->belongsTo(ReportAuthor::class, 'report_author_id');

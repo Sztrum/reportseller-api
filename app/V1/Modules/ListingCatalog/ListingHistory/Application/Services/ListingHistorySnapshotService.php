@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\V1\Modules\ListingCatalog\ListingHistory\Application\Services;
 
 use App\V1\Modules\ListingCatalog\Listing\Domain\DTO\ListingDTO;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Modules\ListingCatalog\ListingHistory\Domain\Aggregates\ListingHistoryAggregate;
 use App\V1\Modules\ListingCatalog\ListingHistory\Domain\Exceptions\ListingSnapshotNotChangedException;
 use App\V1\Modules\ListingCatalog\ListingHistory\Domain\Models\ListingHistory;
@@ -77,9 +78,10 @@ readonly class ListingHistorySnapshotService
         ];
 
         foreach ($fieldsToCompare as $field) {
+            /** @var ListingSellerTypeEnum|bool|int|string|null $lastSnapshotValue */
             $lastSnapshotValue = $lastSnapshot->getAttribute($field);
-            if ($field === 'seller_type' && $lastSnapshotValue !== null) {
-                $lastSnapshotValue = $lastSnapshotValue?->value;
+            if ($field === 'seller_type' && $lastSnapshotValue instanceof ListingSellerTypeEnum) {
+                $lastSnapshotValue = $lastSnapshotValue->value;
             }
 
             if ($lastSnapshotValue != $snapshot[$field]) {

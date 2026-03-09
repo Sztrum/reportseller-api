@@ -38,6 +38,7 @@ class ReportStoreRequest extends BaseRequest
             'report.description' => ['required', 'string', 'min:10', 'max:5000'],
 
             'author' => ['nullable', 'array'],
+            'author.email' => ['nullable', 'string', 'email:rfc', 'max:255'],
             'author.consent_version' => ['nullable', 'string', 'max:50'],
             'author.consent_given_at' => ['nullable', 'date'],
         ];
@@ -45,7 +46,7 @@ class ReportStoreRequest extends BaseRequest
 
     public function messages(): array
     {
-        $messages = trans('report::validation.custom');
+        $messages = __('report::validation.custom');
 
         if (!is_array($messages)) {
             return [];

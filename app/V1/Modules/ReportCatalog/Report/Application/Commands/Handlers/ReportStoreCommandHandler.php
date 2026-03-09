@@ -6,6 +6,7 @@ namespace App\V1\Modules\ReportCatalog\Report\Application\Commands\Handlers;
 
 use App\V1\Core\Application\Command\CommandHandlerInterface;
 use App\V1\Core\Application\Command\CommandInterface;
+use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\Listing\Infrastructure\Repositories\ListingRepository;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Application\Services\ListingChangeProposalDiffService;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
@@ -23,6 +24,8 @@ use Throwable;
 
 readonly class ReportStoreCommandHandler implements CommandHandlerInterface
 {
+    private const DEFAULT_REPORT_STATUS_SLUG = 'new';
+
     public function __construct(
         private PlatformAggregate $platformAggregate,
         private ReportCategoryAggregate $reportCategoryAggregate,
@@ -45,14 +48,17 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
     public function handle(
         CommandInterface $command
     ): void {
+        $normalizedAuthorEmail = ($command->authorDTO->email !== null && trim($command->authorDTO->email) !== '')
+            ? strtolower(trim($command->authorDTO->email))
+            : null;
+
         $platform = $this->platformRepository->fistBySlug($command->listingDTO->platform_slug);
         $this->platformAggregate->ensurePlatformExists($platform);
-        assert($platform !== null);
 
         $category = $this->reportCategoryRepository->firstBySlug($command->listingDTO->report_category_slug);
         $this->reportCategoryAggregate->ensureReportCategoryExists($category);
-        assert($category !== null);
 
+        /** @var Listing|null $listing */
         $listing = null;
         if ($command->listingDTO->external_id !== null) {
             $listing = $this->listingRepository->firstByExternalIdAndPlatform(
@@ -85,21 +91,28 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         ksort($listingPayload);
 
         if ($listing === null) {
+            /** @var Listing $listing */
             $listing = $this->listingRepository->create($listingPayload);
         }
 
-        $reportStatus = $this->reportStatusRepository->firstBySlug('new');
-        $this->reportStatusAggregate->ensureReportStatusExists($reportStatus, 'new');
+        $author = $normalizedAuthorEmail !== null
+            ? $this->reportAuthorRepository->firstByEmail($normalizedAuthorEmail)
+            : null;
 
-        $author = $this->reportAuthorRepository->create([
-            'ip_hash' => null,
-            'consent_version' => $command->authorDTO->consent_version,
-            'consent_given_at' => $command->authorDTO->consent_given_at,
-            'is_blocked' => false,
-            'blocked_at' => null,
-        ]);
+        if ($author === null) {
+            $author = $this->reportAuthorRepository->create([
+                'email' => $normalizedAuthorEmail,
+                'consent_version' => $command->authorDTO->consent_version,
+                'consent_given_at' => $command->authorDTO->consent_given_at,
+                'is_blocked' => false,
+                'blocked_at' => null,
+            ]);
+        }
 
-        $report = $this->reportRepository->create([
+        $reportStatus = $this->reportStatusRepository->firstBySlug(self::DEFAULT_REPORT_STATUS_SLUG);
+        $this->reportStatusAggregate->ensureReportStatusExists($reportStatus, self::DEFAULT_REPORT_STATUS_SLUG);
+
+        $this->reportRepository->create([
             'listing_id' => $listing->id,
             'report_status_id' => $reportStatus->id,
             'report_author_id' => $author->id,
