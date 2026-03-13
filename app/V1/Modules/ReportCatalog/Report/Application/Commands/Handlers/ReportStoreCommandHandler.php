@@ -14,12 +14,14 @@ use App\V1\Modules\ListingCatalog\ListingChangeProposal\Infrastructure\Repositor
 use App\V1\Modules\Platform\Domain\Aggregates\PlatformAggregate;
 use App\V1\Modules\Platform\Infrastructure\Repositories\PlatformRepository;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
+use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 use App\V1\Modules\ReportCatalog\Report\Infrastructure\Repositories\ReportRepository;
 use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\ReportAuthorRepository;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
 use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Aggregates\ReportStatusAggregate;
 use App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories\ReportStatusRepository;
+use Illuminate\Support\Str;
 use Throwable;
 
 readonly class ReportStoreCommandHandler implements CommandHandlerInterface
@@ -112,16 +114,23 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
         $reportStatus = $this->reportStatusRepository->firstBySlug(self::DEFAULT_REPORT_STATUS_SLUG);
         $this->reportStatusAggregate->ensureReportStatusExists($reportStatus, self::DEFAULT_REPORT_STATUS_SLUG);
 
-        $this->reportRepository->create([
+        $receiptToken = Str::random(64);
+
+        /** @var Report $report */
+        $report = $this->reportRepository->create([
             'listing_id' => $listing->id,
             'report_status_id' => $reportStatus->id,
             'report_author_id' => $author->id,
             'title' => $command->reportDTO->title,
             'description' => $command->reportDTO->description,
+            'receipt_token_hash' => hash('sha256', $receiptToken),
             'moderation_note' => null,
             'is_published' => false,
             'published_at' => null,
         ]);
+
+        $command->reportId = $report->id;
+        $command->receiptToken = $receiptToken;
 
         $latestPendingProposal = $this->listingChangeProposalRepository->latestPendingForListing($listing->id);
         $shouldCreateProposal = $this->listingChangeProposalDiffService->hasListingPayloadChanges($listing, $listingPayload);

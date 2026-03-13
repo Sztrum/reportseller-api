@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $report_author_id
  * @property string $title
  * @property string $description
+ * @property string $receipt_token_hash
  * @property string|null $moderation_note
  * @property bool $is_published
  * @property \Illuminate\Support\Carbon|null $published_at
@@ -40,6 +41,7 @@ class Report extends Model
         'report_author_id',
         'title',
         'description',
+        'receipt_token_hash',
         'moderation_note',
         'is_published',
         'published_at',
@@ -48,6 +50,10 @@ class Report extends Model
     protected $casts = [
         'is_published' => 'bool',
         'published_at' => 'datetime',
+    ];
+
+    protected $hidden = [
+        'receipt_token_hash',
     ];
 
     /**
