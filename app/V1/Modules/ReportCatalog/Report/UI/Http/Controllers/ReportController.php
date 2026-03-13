@@ -43,9 +43,7 @@ class ReportController extends ApiController
 
         return $this->responseFactory->json([
             'message' => __('report::messages.store_report_success'),
-            'receipt_url' => route('api.reports.receipt.show', [
-                'report_id' => $command->reportId,
-            ]),
+            'report_id' => $command->reportId,
             'receipt_token' => $command->receiptToken,
         ], Response::HTTP_CREATED);
     }
