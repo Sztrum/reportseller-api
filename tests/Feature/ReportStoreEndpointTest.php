@@ -13,27 +13,28 @@ use Database\Seeders\PlatformSeeder;
 use Database\Seeders\ReportCategorySeeder;
 use Database\Seeders\ReportStatusSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class ReportStoreEndpointTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_stores_report_with_related_entities_and_title(): void
+    public function test_it_stores_report_with_related_entities_and_returns_receipt_access_data(): void
     {
         $this->seedStoreDependencies();
 
-        $payload = $this->buildPayload(
+        $response = $this->postJson(route('api.reports.store'), $this->buildPayload(
             listingOverrides: ['url' => 'https://olx.pl/oferta/123'],
             reportOverrides: [
                 'title' => 'Podejrzane ogloszenie',
                 'description' => 'Opis ma wiecej niz dziesiec znakow i jest poprawny.',
             ],
-        );
+        ));
 
-        $response = $this->postJson(route('api.reports.store'), $payload);
+        $response->assertCreated();
 
-        $response->assertOk();
+        $receiptData = $this->assertReceiptResponse($response);
 
         $listing = Listing::query()->first();
         $this->assertNotNull($listing);
@@ -41,17 +42,20 @@ class ReportStoreEndpointTest extends TestCase
         $this->assertDatabaseCount('listing_histories', 0);
         $this->assertDatabaseCount('listing_change_proposals', 0);
         $this->assertDatabaseHas('reports', [
+            'id' => $receiptData['report_id'],
             'listing_id' => $listing->id,
             'title' => 'Podejrzane ogloszenie',
             'description' => 'Opis ma wiecej niz dziesiec znakow i jest poprawny.',
+            'receipt_token_hash' => hash('sha256', $receiptData['receipt_token']),
         ]);
         $this->assertDatabaseCount('report_authors', 1);
 
-        $report = Report::query()->first();
         $author = ReportAuthor::query()->first();
-        $this->assertNotNull($report);
         $this->assertNotNull($author);
-        $this->assertSame($author->id, $report->report_author_id);
+        $reportAuthorId = ReportAuthor::query()
+            ->join('reports', 'report_authors.id', '=', 'reports.report_author_id')
+            ->value('report_authors.id');
+        $this->assertSame($author->id, $reportAuthorId);
 
         $this->assertDatabaseCount('report_attachments', 0);
     }
@@ -65,7 +69,7 @@ class ReportStoreEndpointTest extends TestCase
         $this->postJson(route('api.reports.store'), $this->buildPayload(
             listingOverrides: ['url' => 'https://olx.pl/oferta/email-1'],
             authorOverrides: ['email' => strtoupper($email)],
-        ))->assertOk();
+        ))->assertCreated();
 
         $this->postJson(route('api.reports.store'), $this->buildPayload(
             listingOverrides: ['url' => 'https://olx.pl/oferta/email-2'],
@@ -74,13 +78,41 @@ class ReportStoreEndpointTest extends TestCase
                 'description' => 'Drugie zgloszenie powinno wykorzystac tego samego autora.',
             ],
             authorOverrides: ['email' => $email],
-        ))->assertOk();
+        ))->assertCreated();
 
         $this->assertDatabaseCount('reports', 2);
         $this->assertDatabaseCount('report_authors', 1);
         $this->assertDatabaseHas('report_authors', [
             'email' => $email,
         ]);
+    }
+
+    public function test_it_creates_distinct_authors_when_email_is_missing(): void
+    {
+        $this->seedStoreDependencies();
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: ['url' => 'https://olx.pl/oferta/no-email-1'],
+        ))->assertCreated();
+
+        $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: ['url' => 'https://olx.pl/oferta/no-email-2'],
+            reportOverrides: [
+                'title' => 'Drugie anonimowe zgloszenie',
+                'description' => 'Drugie anonimowe zgloszenie powinno utworzyc nowego autora.',
+            ],
+        ))->assertCreated();
+
+        $this->assertDatabaseCount('reports', 2);
+        $this->assertDatabaseCount('report_authors', 2);
+        $this->assertSame(2, ReportAuthor::query()->whereNull('email')->count());
+
+        $reports = Report::query()
+            ->orderBy('created_at')
+            ->get();
+
+        $this->assertCount(2, $reports);
+        $this->assertNotSame($reports[0]->report_author_id, $reports[1]->report_author_id);
     }
 
     public function test_it_does_not_create_change_proposal_when_listing_data_is_unchanged(): void
@@ -91,7 +123,7 @@ class ReportStoreEndpointTest extends TestCase
             listingOverrides: ['url' => 'https://olx.pl/oferta/555']
         );
 
-        $this->postJson(route('api.reports.store'), $basePayload)->assertOk();
+        $this->postJson(route('api.reports.store'), $basePayload)->assertCreated();
 
         $secondPayload = $this->buildPayload(
             listingOverrides: ['url' => 'https://olx.pl/oferta/555'],
@@ -101,7 +133,7 @@ class ReportStoreEndpointTest extends TestCase
             ]
         );
 
-        $this->postJson(route('api.reports.store'), $secondPayload)->assertOk();
+        $this->postJson(route('api.reports.store'), $secondPayload)->assertCreated();
 
         $this->assertDatabaseCount('listings', 1);
         $this->assertDatabaseCount('listing_histories', 0);
@@ -118,7 +150,7 @@ class ReportStoreEndpointTest extends TestCase
                 'external_id' => 'ext-1',
                 'url' => 'https://olx.pl/oferta/fallback-url',
             ]
-        ))->assertOk();
+        ))->assertCreated();
 
         $response = $this->postJson(route('api.reports.store'), $this->buildPayload(
             listingOverrides: [
@@ -131,7 +163,7 @@ class ReportStoreEndpointTest extends TestCase
             ]
         ));
 
-        $response->assertOk();
+        $response->assertCreated();
 
         $this->assertDatabaseCount('listings', 1);
         $this->assertDatabaseCount('reports', 2);
@@ -153,7 +185,7 @@ class ReportStoreEndpointTest extends TestCase
             ]
         );
 
-        $this->postJson(route('api.reports.store'), $firstPayload)->assertOk();
+        $this->postJson(route('api.reports.store'), $firstPayload)->assertCreated();
 
         $secondPayload = $this->buildPayload(
             listingOverrides: [
@@ -167,7 +199,7 @@ class ReportStoreEndpointTest extends TestCase
             ]
         );
 
-        $this->postJson(route('api.reports.store'), $secondPayload)->assertOk();
+        $this->postJson(route('api.reports.store'), $secondPayload)->assertCreated();
 
         $listing = Listing::query()->first();
         $this->assertNotNull($listing);
@@ -202,7 +234,7 @@ class ReportStoreEndpointTest extends TestCase
                 'price' => 1000,
                 'title' => 'Tytul bazowy',
             ]
-        ))->assertOk();
+        ))->assertCreated();
 
         $changedPayload = $this->buildPayload(
             listingOverrides: [
@@ -216,8 +248,8 @@ class ReportStoreEndpointTest extends TestCase
             ]
         );
 
-        $this->postJson(route('api.reports.store'), $changedPayload)->assertOk();
-        $this->postJson(route('api.reports.store'), $changedPayload)->assertOk();
+        $this->postJson(route('api.reports.store'), $changedPayload)->assertCreated();
+        $this->postJson(route('api.reports.store'), $changedPayload)->assertCreated();
 
         $this->assertDatabaseCount('listing_change_proposals', 1);
 
@@ -244,7 +276,7 @@ class ReportStoreEndpointTest extends TestCase
                 'price' => 1100,
                 'title' => 'Stary tytul',
             ]
-        ))->assertOk();
+        ))->assertCreated();
 
         $this->postJson(route('api.reports.store'), $this->buildPayload(
             listingOverrides: [
@@ -256,7 +288,7 @@ class ReportStoreEndpointTest extends TestCase
                 'title' => 'Zmiana danych',
                 'description' => 'Prosze o aktualizacje danych listingu.',
             ]
-        ))->assertOk();
+        ))->assertCreated();
 
         /** @var ListingChangeProposal|null $changeProposal */
         $changeProposal = ListingChangeProposal::query()->first();
@@ -341,6 +373,45 @@ class ReportStoreEndpointTest extends TestCase
             'listing' => $listing,
             'report' => $report,
             'author' => $author,
+        ];
+    }
+
+    /**
+     * @return array{report_id: string, receipt_url: string, receipt_token: string}
+     */
+    private function assertReceiptResponse(TestResponse $response): array
+    {
+        $response
+            ->assertJsonStructure([
+                'message',
+                'receipt_url',
+                'receipt_token',
+            ])
+            ->assertJson([
+                'message' => 'Zgloszenie zostalo zapisane.',
+            ]);
+
+        $json = $response->json();
+
+        $this->assertIsArray($json);
+        $this->assertIsString($json['receipt_url'] ?? null);
+        $this->assertIsString($json['receipt_token'] ?? null);
+        $this->assertNotSame('', $json['receipt_token']);
+
+        $receiptPath = parse_url((string) $json['receipt_url'], PHP_URL_PATH);
+
+        $this->assertIsString($receiptPath);
+
+        $receiptPathSegments = explode('/', trim($receiptPath, '/'));
+        $reportId = $receiptPathSegments[count($receiptPathSegments) - 2] ?? null;
+
+        $this->assertIsString($reportId);
+        $this->assertSame(route('api.reports.receipt.show', ['report_id' => $reportId]), $json['receipt_url']);
+
+        return [
+            'report_id' => $reportId,
+            'receipt_url' => (string) $json['receipt_url'],
+            'receipt_token' => (string) $json['receipt_token'],
         ];
     }
 

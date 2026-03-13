@@ -9,8 +9,11 @@ use App\V1\Modules\ListingCatalog\Listing\Domain\DTO\ListingDTO;
 use App\V1\Modules\ReportCatalog\Report\Domain\DTO\ReportDTO;
 use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\DTO\AuthorDTO;
 
-final readonly class ReportStoreCommand implements CommandTransactionalInterface
+final class ReportStoreCommand implements CommandTransactionalInterface
 {
+    public ?string $reportId = null;
+    public ?string $receiptToken = null;
+
     public function __construct(
         public ListingDTO $listingDTO,
         public ReportDTO $reportDTO,
