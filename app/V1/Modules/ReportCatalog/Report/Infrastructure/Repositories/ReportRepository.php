@@ -9,6 +9,8 @@ use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 
 class ReportRepository extends EloquentModelRepository
 {
+    private const RECEIPT_EXPIRED_STATUS_SLUG = 'confirmed';
+
     public function model(): Report
     {
         return new Report();
@@ -19,16 +21,21 @@ class ReportRepository extends EloquentModelRepository
         return 'report';
     }
 
-    public function firstByIdWithReceiptRelations(string $id): ?Report
+    public function firstByReceiptTokenWithReceiptRelations(string $receiptToken): ?Report
     {
         /** @var Report|null $report */
         $report = $this->query()
             ->with([
                 'listing.platform',
                 'reportStatus',
-                'reportAuthor',
             ])
-            ->find($id);
+            ->where('receipt_token_hash', hash('sha256', $receiptToken))
+            ->where('is_published', false)
+            ->whereNull('published_at')
+            ->whereHas('reportStatus', static function ($query): void {
+                $query->where('slug', '!=', self::RECEIPT_EXPIRED_STATUS_SLUG);
+            })
+            ->first();
 
         return $report;
     }

@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
+use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use Database\Seeders\PlatformSeeder;
 use Database\Seeders\ReportCategorySeeder;
 use Database\Seeders\ReportStatusSeeder;
@@ -38,17 +39,14 @@ class ReportGetReceiptEndpointTest extends TestCase
         $this->assertNotNull($report);
 
         $this->getJson(route('api.reports.receipt.show', [
-            'report_id' => $receiptData['report_id'],
             'receipt_token' => $receiptData['receipt_token'],
         ]))
             ->assertOk()
             ->assertJson([
-                'id' => $report->id,
                 'title' => 'Podejrzane ogloszenie',
                 'description' => 'Opis ma wiecej niz dziesiec znakow i jest poprawny.',
                 'is_published' => false,
                 'listing' => [
-                    'id' => $listing->id,
                     'url' => 'https://olx.pl/oferta/123',
                     'title' => 'Tytul listingu',
                     'price' => 1200,
@@ -58,10 +56,14 @@ class ReportGetReceiptEndpointTest extends TestCase
                 'report_status' => [
                     'slug' => 'new',
                 ],
-            ]);
+            ])
+            ->assertJsonMissingPath('id')
+            ->assertJsonMissingPath('listing.id')
+            ->assertJsonMissingPath('report_status.id')
+            ->assertJsonMissingPath('moderation_note');
     }
 
-    public function test_it_denies_receipt_access_when_token_is_invalid(): void
+    public function test_it_returns_not_found_when_token_is_invalid(): void
     {
         $this->seedStoreDependencies();
 
@@ -69,34 +71,42 @@ class ReportGetReceiptEndpointTest extends TestCase
             listingOverrides: ['url' => 'https://olx.pl/oferta/private-receipt']
         ));
 
-        $receiptData = $this->assertReceiptResponse($storeResponse);
+        $this->assertReceiptResponse($storeResponse);
 
         $this->getJson(route('api.reports.receipt.show', [
-            'report_id' => $receiptData['report_id'],
             'receipt_token' => 'invalid-token',
         ]))
-            ->assertForbidden()
+            ->assertNotFound()
             ->assertJson([
-                'status' => 403,
-                'message' => 'Brak dostepu do potwierdzenia tego zgloszenia.',
+                'status' => 404,
             ]);
     }
 
-    public function test_it_requires_receipt_token_for_receipt_access(): void
+    public function test_it_returns_not_found_when_report_was_already_confirmed(): void
     {
         $this->seedStoreDependencies();
 
         $storeResponse = $this->postJson(route('api.reports.store'), $this->buildPayload(
-            listingOverrides: ['url' => 'https://olx.pl/oferta/receipt-required']
+            listingOverrides: ['url' => 'https://olx.pl/oferta/confirmed-receipt']
         ));
 
         $receiptData = $this->assertReceiptResponse($storeResponse);
 
+        $confirmedStatus = ReportStatus::query()->where('slug', 'confirmed')->first();
+
+        $this->assertNotNull($confirmedStatus);
+
+        $report = Report::query()->first();
+        $this->assertNotNull($report);
+
+        $report->forceFill([
+            'report_status_id' => $confirmedStatus->id,
+        ])->save();
+
         $this->getJson(route('api.reports.receipt.show', [
-            'report_id' => $receiptData['report_id'],
+            'receipt_token' => $receiptData['receipt_token'],
         ]))
-            ->assertStatus(422)
-            ->assertJsonValidationErrors(['receipt_token']);
+            ->assertNotFound();
     }
 
     private function seedStoreDependencies(): void
@@ -154,7 +164,7 @@ class ReportGetReceiptEndpointTest extends TestCase
     }
 
     /**
-     * @return array{report_id: string, receipt_url: string, receipt_token: string}
+     * @return array{receipt_token: string}
      */
     private function assertReceiptResponse(TestResponse $response): array
     {
@@ -162,7 +172,6 @@ class ReportGetReceiptEndpointTest extends TestCase
             ->assertCreated()
             ->assertJsonStructure([
                 'message',
-                'receipt_url',
                 'receipt_token',
             ])
             ->assertJson([
@@ -172,23 +181,10 @@ class ReportGetReceiptEndpointTest extends TestCase
         $json = $response->json();
 
         $this->assertIsArray($json);
-        $this->assertIsString($json['receipt_url'] ?? null);
         $this->assertIsString($json['receipt_token'] ?? null);
         $this->assertNotSame('', $json['receipt_token']);
 
-        $receiptPath = parse_url((string) $json['receipt_url'], PHP_URL_PATH);
-
-        $this->assertIsString($receiptPath);
-
-        $receiptPathSegments = explode('/', trim($receiptPath, '/'));
-        $reportId = $receiptPathSegments[count($receiptPathSegments) - 2] ?? null;
-
-        $this->assertIsString($reportId);
-        $this->assertSame(route('api.reports.receipt.show', ['report_id' => $reportId]), $json['receipt_url']);
-
         return [
-            'report_id' => $reportId,
-            'receipt_url' => (string) $json['receipt_url'],
             'receipt_token' => (string) $json['receipt_token'],
         ];
     }

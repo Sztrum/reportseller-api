@@ -377,14 +377,13 @@ class ReportStoreEndpointTest extends TestCase
     }
 
     /**
-     * @return array{report_id: string, receipt_url: string, receipt_token: string}
+     * @return array{report_id: string, receipt_token: string}
      */
     private function assertReceiptResponse(TestResponse $response): array
     {
         $response
             ->assertJsonStructure([
                 'message',
-                'receipt_url',
                 'receipt_token',
             ])
             ->assertJson([
@@ -394,23 +393,17 @@ class ReportStoreEndpointTest extends TestCase
         $json = $response->json();
 
         $this->assertIsArray($json);
-        $this->assertIsString($json['receipt_url'] ?? null);
         $this->assertIsString($json['receipt_token'] ?? null);
         $this->assertNotSame('', $json['receipt_token']);
 
-        $receiptPath = parse_url((string) $json['receipt_url'], PHP_URL_PATH);
-
-        $this->assertIsString($receiptPath);
-
-        $receiptPathSegments = explode('/', trim($receiptPath, '/'));
-        $reportId = $receiptPathSegments[count($receiptPathSegments) - 2] ?? null;
+        $reportId = Report::query()
+            ->where('receipt_token_hash', hash('sha256', (string) $json['receipt_token']))
+            ->value('id');
 
         $this->assertIsString($reportId);
-        $this->assertSame(route('api.reports.receipt.show', ['report_id' => $reportId]), $json['receipt_url']);
 
         return [
             'report_id' => $reportId,
-            'receipt_url' => (string) $json['receipt_url'],
             'receipt_token' => (string) $json['receipt_token'],
         ];
     }

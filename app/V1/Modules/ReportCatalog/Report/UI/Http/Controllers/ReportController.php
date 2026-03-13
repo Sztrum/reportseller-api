@@ -12,7 +12,6 @@ use App\V1\Modules\ReportCatalog\Report\Domain\Aggregates\ReportAggregate;
 use App\V1\Modules\ReportCatalog\Report\Domain\DTO\ReportDTO;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 use App\V1\Modules\ReportCatalog\Report\Infrastructure\Repositories\ReportRepository;
-use App\V1\Modules\ReportCatalog\Report\UI\Http\Requests\ReportReceiptShowRequest;
 use App\V1\Modules\ReportCatalog\Report\UI\Http\Requests\ReportStoreRequest;
 use App\V1\Modules\ReportCatalog\ReportAuthor\Domain\DTO\AuthorDTO;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -43,7 +42,6 @@ class ReportController extends ApiController
 
         return $this->responseFactory->json([
             'message' => __('report::messages.store_report_success'),
-            'report_id' => $command->reportId,
             'receipt_token' => $command->receiptToken,
         ], Response::HTTP_CREATED);
     }
@@ -52,23 +50,18 @@ class ReportController extends ApiController
      * @throws \Throwable
      */
     public function getReceipt(
-        ReportReceiptShowRequest $request
+        string $receipt_token
     ): JsonResponse {
         /** @var Report|null $report */
-        $report = $this->reportRepository->firstByIdWithReceiptRelations(
-            (string) $request->route('report_id')
-        );
+        $report = $this->reportRepository->firstByReceiptTokenWithReceiptRelations($receipt_token);
         $this->reportAggregate->ensureReportExists($report);
-        $this->reportAggregate->ensureReceiptTokenMatches($report, (string) $request->input('receipt_token'));
 
         return $this->responseFactory->json([
-            'id' => $report->id,
             'title' => $report->title,
             'description' => $report->description,
             'is_published' => $report->is_published,
             'published_at' => $report->published_at?->toISOString(),
             'listing' => [
-                'id' => $report->listing->id,
                 'url' => $report->listing->url,
                 'title' => $report->listing->title,
                 'price' => $report->listing->price,
@@ -76,7 +69,6 @@ class ReportController extends ApiController
                 'platform_slug' => $report->listing->platform->slug,
             ],
             'report_status' => [
-                'id' => $report->reportStatus->id,
                 'slug' => $report->reportStatus->slug,
             ],
         ], Response::HTTP_OK);
