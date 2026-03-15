@@ -12,11 +12,11 @@ final class ReportStatusSeeder extends Seeder
     public function run(): void
     {
         $statuses = [
-            ['name' => 'Nowe', 'slug' => 'new', 'description' => 'Zgłoszenie dodane i czeka na weryfikację.', 'order' => 1],
-            ['name' => 'W trakcie', 'slug' => 'in-progress', 'description' => 'Zgłoszenie jest analizowane.', 'order' => 2],
-            ['name' => 'Potwierdzone', 'slug' => 'confirmed', 'description' => 'Zgłoszenie potwierdzone jako zasadne.', 'order' => 3],
-            ['name' => 'Odrzucone', 'slug' => 'rejected', 'description' => 'Zgłoszenie odrzucone.', 'order' => 4],
-            ['name' => 'Duplikat', 'slug' => 'duplicate', 'description' => 'Zgłoszenie zdublowane z innym.', 'order' => 5],
+            ['name' => 'Nowe', 'slug' => 'new', 'description' => 'Zgłoszenie dodane i czeka na weryfikację.'],
+            ['name' => 'W trakcie weryfikacji', 'slug' => 'in-progress', 'description' => 'Zgłoszenie jest analizowane.'],
+            ['name' => 'Zweryfikowane', 'slug' => 'confirmed', 'description' => 'Zgłoszenie potwierdzone jako zasadne.'],
+            ['name' => 'Odrzucone', 'slug' => 'rejected', 'description' => 'Zgłoszenie odrzucone.'],
+            ['name' => 'Duplikat', 'slug' => 'duplicate', 'description' => 'Zgłoszenie zdublowane z innym.'],
         ];
 
         foreach ($statuses as $s) {
@@ -24,6 +24,7 @@ final class ReportStatusSeeder extends Seeder
                 ['slug' => $s['slug']],
                 [
                     'name' => $s['name'],
+                    'description' => $s['description'],
                     'is_active' => true,
                 ],
             );
