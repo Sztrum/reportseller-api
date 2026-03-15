@@ -32,3 +32,6 @@ Track cumulative recommended human development effort for the whole project usin
 6. 2026-03-12: report submission gained private receipt-token access, documented report-plus-listing creation rules, and updated report store responses and tests for anonymous follow-up access.
    - Estimated effort delta added: 3 h - 5 h
    - Running total: 160 h 30 min - 267 h
+7. 2026-03-15: platform dictionary API added a public index endpoint with active-only ordered results for frontend consumers and feature coverage tests.
+   - Estimated effort delta added: 1 h 30 min - 3 h
+   - Running total: 162 h - 270 h
