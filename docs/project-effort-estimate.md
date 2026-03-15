@@ -26,3 +26,6 @@ Track cumulative recommended human development effort for the whole project usin
 4. 2026-03-07: listing change proposals were decoupled from reports by removing `report_id` and keeping proposals keyed only by listing context.
    - Estimated effort delta added: 1 h 30 min - 2 h
    - Running total: 156 h - 260 h
+5. 2026-03-15: report category dictionary API added a public index endpoint with active-only ordered results for frontend consumers and feature coverage tests.
+   - Estimated effort delta added: 1 h 30 min - 3 h
+   - Running total: 157 h 30 min - 263 h
