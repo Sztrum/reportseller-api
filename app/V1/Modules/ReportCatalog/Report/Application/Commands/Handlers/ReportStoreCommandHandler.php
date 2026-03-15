@@ -54,10 +54,10 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             ? strtolower(trim($command->authorDTO->email))
             : null;
 
-        $platform = $this->platformRepository->fistBySlug($command->listingDTO->platform_slug);
+        $platform = $this->platformRepository->firstActiveBySlug($command->listingDTO->platform_slug);
         $this->platformAggregate->ensurePlatformExists($platform);
 
-        $category = $this->reportCategoryRepository->firstBySlug($command->listingDTO->report_category_slug);
+        $category = $this->reportCategoryRepository->firstActiveBySlug($command->listingDTO->report_category_slug);
         $this->reportCategoryAggregate->ensureReportCategoryExists($category);
 
         /** @var Listing|null $listing */

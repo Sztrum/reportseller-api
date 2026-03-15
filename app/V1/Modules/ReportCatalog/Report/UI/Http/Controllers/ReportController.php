@@ -70,6 +70,8 @@ class ReportController extends ApiController
             ],
             'report_status' => [
                 'slug' => $report->reportStatus->slug,
+                'name' => $report->reportStatus->name,
+                'description' => $report->reportStatus->description,
             ],
         ], Response::HTTP_OK);
     }
