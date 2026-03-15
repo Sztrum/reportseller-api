@@ -13,7 +13,7 @@ final class ReportStatusSeeder extends Seeder
     {
         $statuses = [
             ['name' => 'Nowe', 'slug' => 'new', 'description' => 'Zgłoszenie dodane i czeka na weryfikację.', 'order' => 1],
-            ['name' => 'W trakcie', 'slug' => 'in-progress', 'description' => 'Zgłoszenie jest analizowane.', 'order' => 2],
+            ['name' => 'W trakcie weryfikacji', 'slug' => 'in-progress', 'description' => 'Zgłoszenie jest analizowane.', 'order' => 2],
             ['name' => 'Potwierdzone', 'slug' => 'confirmed', 'description' => 'Zgłoszenie potwierdzone jako zasadne.', 'order' => 3],
             ['name' => 'Odrzucone', 'slug' => 'rejected', 'description' => 'Zgłoszenie odrzucone.', 'order' => 4],
             ['name' => 'Duplikat', 'slug' => 'duplicate', 'description' => 'Zgłoszenie zdublowane z innym.', 'order' => 5],
