@@ -16,6 +16,7 @@ return new class extends AbstractCreateTableMigration
             $table->uuid('id')->primary();
             $table->string('slug')->unique();
             $table->string('name');
+            $table->string('description')->nullable();
             $table->boolean('is_active');
             $table->timestamps();
         });
