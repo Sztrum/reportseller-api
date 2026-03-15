@@ -31,6 +31,18 @@ class PlatformRepository extends EloquentModelRepository
         return $platform;
     }
 
+    public function firstActiveBySlug(
+        string $slug
+    ): ?Platform {
+        /** @var Platform|null $platform */
+        $platform = $this->query()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->first();
+
+        return $platform;
+    }
+
     /**
      * @return Collection<int, Platform>
      */

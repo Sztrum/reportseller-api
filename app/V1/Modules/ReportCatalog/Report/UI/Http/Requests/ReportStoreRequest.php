@@ -7,6 +7,7 @@ namespace App\V1\Modules\ReportCatalog\Report\UI\Http\Requests;
 use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Shared\UI\Http\Requests\BaseRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\Query\Builder;
 
 class ReportStoreRequest extends BaseRequest
 {
@@ -19,8 +20,22 @@ class ReportStoreRequest extends BaseRequest
             'listing' => ['required', 'array'],
 
             'listing.url' => ['required', 'string', 'max:2048', 'url'],
-            'listing.platform_slug' => ['required', 'string', 'max:50', 'exists:platforms,slug'],
-            'listing.report_category_slug' => ['required', 'string', 'max:50', 'exists:report_categories,slug'],
+            'listing.platform_slug' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::exists('platforms', 'slug')->where(
+                    static fn (Builder $query): Builder => $query->where('is_active', true)
+                ),
+            ],
+            'listing.report_category_slug' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::exists('report_categories', 'slug')->where(
+                    static fn (Builder $query): Builder => $query->where('is_active', true)
+                ),
+            ],
 
             'listing.external_id' => ['nullable', 'string', 'max:191'],
             'listing.title' => ['nullable', 'string', 'max:191'],

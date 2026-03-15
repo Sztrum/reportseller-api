@@ -322,12 +322,59 @@ class ReportStoreEndpointTest extends TestCase
         $this->assertDatabaseCount('reports', 0);
     }
 
+    public function test_it_rejects_inactive_platform_slug(): void
+    {
+        $this->seedStoreDependencies();
+
+        $response = $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: [
+                'platform_slug' => 'inactive-platform',
+            ],
+        ));
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'listing.platform_slug',
+            ]);
+    }
+
+    public function test_it_rejects_inactive_report_category_slug(): void
+    {
+        $this->seedStoreDependencies();
+
+        $response = $this->postJson(route('api.reports.store'), $this->buildPayload(
+            listingOverrides: [
+                'report_category_slug' => 'inactive-category',
+            ],
+        ));
+
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'listing.report_category_slug',
+            ]);
+    }
+
     private function seedStoreDependencies(): void
     {
         $this->seed([
             PlatformSeeder::class,
             ReportCategorySeeder::class,
             ReportStatusSeeder::class,
+        ]);
+
+        \App\V1\Modules\Platform\Domain\Models\Platform::factory()->create([
+            'name' => 'Nieaktywna platforma',
+            'slug' => 'inactive-platform',
+            'is_active' => false,
+        ]);
+
+        \App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models\ReportCategory::factory()->create([
+            'name' => 'Nieaktywna kategoria',
+            'slug' => 'inactive-category',
+            'description' => 'Ta kategoria nie powinna byc dostepna.',
+            'is_active' => false,
         ]);
     }
 

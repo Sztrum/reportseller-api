@@ -55,6 +55,8 @@ class ReportGetReceiptEndpointTest extends TestCase
                 ],
                 'report_status' => [
                     'slug' => 'new',
+                    'name' => 'Nowe',
+                    'description' => 'Zgłoszenie dodane i czeka na weryfikację.',
                 ],
             ])
             ->assertJsonMissingPath('id')

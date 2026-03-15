@@ -31,6 +31,18 @@ class ReportCategoryRepository extends EloquentModelRepository
         return $reportCategory;
     }
 
+    public function firstActiveBySlug(
+        string $slug
+    ): ?ReportCategory {
+        /** @var ReportCategory|null $reportCategory */
+        $reportCategory = $this->query()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->first();
+
+        return $reportCategory;
+    }
+
     /**
      * @return Collection<int, ReportCategory>
      */
