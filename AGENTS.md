@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Version
-v1.16.0
+v1.17.0
 
 ## Scope
 This document applies to the entire repository.
@@ -43,6 +43,7 @@ Read documents in this exact order before implementation:
     - `ReportAttachment`
     - `ReportCategory`
     - `ReportStatus`
+    - local rules: `app/V1/Modules/ReportCatalog/Report/AGENTS.md`
 
 ## Project-specific cross-cutting rules
 - Default implementation and analysis scope is `app/V1/**`.

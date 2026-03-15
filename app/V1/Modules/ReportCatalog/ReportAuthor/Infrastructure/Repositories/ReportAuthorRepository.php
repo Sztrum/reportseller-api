@@ -14,6 +14,16 @@ class ReportAuthorRepository extends EloquentModelRepository
         return new ReportAuthor();
     }
 
+    public function firstByEmail(string $email): ?ReportAuthor
+    {
+        /** @var ?ReportAuthor $reportAuthor */
+        $reportAuthor = $this->query()
+            ->where('email', $email)
+            ->first();
+
+        return $reportAuthor;
+    }
+
     public function moduleName(): string
     {
         return 'report-author';

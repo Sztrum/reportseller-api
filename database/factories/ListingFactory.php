@@ -21,18 +21,17 @@ final class ListingFactory extends Factory
 
     public function definition(): array
     {
-        $prefixes = [
-            'Laptop używany',
-            'Rower miejski',
-            'Telefon komórkowy',
-            'Kanapa narożna',
-            'Mieszkanie do wynajęcia',
-            'Samochód osobowy',
-        ];
-        $cities = ['Warszawa', 'Kraków', 'Gdańsk', 'Wrocław', 'Poznań', 'Łódź', 'Bydgoszcz', 'Toruń'];
-        $title = $this->faker->randomElement($prefixes) . ' ' . $this->faker->numberBetween(2015, 2026);
+        /** @var list<string> $prefixes */
+        $prefixes = __('listing::factory.title_prefixes');
+        /** @var list<string> $cities */
+        $cities = __('listing::factory.cities');
+        /** @var string $titlePrefix */
+        $titlePrefix = $this->faker->randomElement($prefixes);
+        $title = $titlePrefix . ' ' . $this->faker->numberBetween(2015, 2026);
+        /** @var string $city */
         $city = $this->faker->randomElement($cities);
         $slug = Str::slug($title . '-' . $city . '-' . $this->faker->unique()->numberBetween(1, 999999));
+        /** @var ListingSellerTypeEnum $sellerType */
         $sellerType = $this->faker->randomElement(ListingSellerTypeEnum::cases());
         $isActiveExternal = $this->faker->boolean(88);
 
@@ -42,7 +41,10 @@ final class ListingFactory extends Factory
             'external_id' => Str::uuid(),
             'url' => 'https://listing-' . $this->faker->unique()->slug(2) . '.test/oferta/' . $slug,
             'title' => $title,
-            'description' => sprintf('Przykładowe ogłoszenie testowe: %s. Odbiór osobisty w %s lub wysyłka.', mb_strtolower($title), $city),
+            'description' => __('listing::factory.description', [
+                'title' => mb_strtolower($title),
+                'city' => $city,
+            ]),
             'price' => $this->faker->numberBetween(600, 150000),
             'currency' => 'PLN',
             'seller_type' => $sellerType,

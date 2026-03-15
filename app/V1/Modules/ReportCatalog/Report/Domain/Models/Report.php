@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $report_author_id
  * @property string $title
  * @property string $description
+ * @property string $receipt_token_hash
  * @property string|null $moderation_note
  * @property bool $is_published
  * @property \Illuminate\Support\Carbon|null $published_at
@@ -40,6 +41,7 @@ class Report extends Model
         'report_author_id',
         'title',
         'description',
+        'receipt_token_hash',
         'moderation_note',
         'is_published',
         'published_at',
@@ -50,16 +52,29 @@ class Report extends Model
         'published_at' => 'datetime',
     ];
 
+    protected $hidden = [
+        'receipt_token_hash',
+    ];
+
+    /**
+     * @return BelongsTo<Listing, $this>
+     */
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class, 'listing_id');
     }
 
+    /**
+     * @return BelongsTo<ReportStatus, $this>
+     */
     public function reportStatus(): BelongsTo
     {
         return $this->belongsTo(ReportStatus::class, 'report_status_id');
     }
 
+    /**
+     * @return BelongsTo<ReportAuthor, $this>
+     */
     public function reportAuthor(): BelongsTo
     {
         return $this->belongsTo(ReportAuthor::class, 'report_author_id');

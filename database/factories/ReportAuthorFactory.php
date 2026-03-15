@@ -18,7 +18,7 @@ final class ReportAuthorFactory extends Factory
     public function definition(): array
     {
         return [
-            'ip_hash' => hash('sha256', $this->faker->ipv4()),
+            'email' => $this->faker->unique()->safeEmail(),
             'consent_version' => 'v1',
             'consent_given_at' => $this->faker->dateTimeBetween('-6 months'),
             'is_blocked' => false,

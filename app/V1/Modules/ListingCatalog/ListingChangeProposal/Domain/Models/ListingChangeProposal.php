@@ -52,6 +52,9 @@ class ListingChangeProposal extends Model
         'reviewed_at' => 'datetime',
     ];
 
+    /**
+     * @return BelongsTo<Listing, $this>
+     */
     public function listing(): BelongsTo
     {
         return $this->belongsTo(Listing::class, 'listing_id');

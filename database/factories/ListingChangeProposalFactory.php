@@ -19,7 +19,10 @@ final class ListingChangeProposalFactory extends Factory
     public function definition(): array
     {
         $requestedAt = $this->faker->dateTimeBetween('-30 days', '-2 days');
-        $reviewedAt = $this->faker->optional(0.65)->dateTimeBetween($requestedAt);
+        /** @var \DateTime|null $reviewedAt */
+        $reviewedAt = $this->faker->boolean(65)
+            ? $this->faker->dateTimeBetween($requestedAt)
+            : null;
         $status = $this->faker->randomElement([ListingChangeProposal::STATUS_PENDING, ListingChangeProposal::STATUS_APPROVED, ListingChangeProposal::STATUS_REJECTED,]);
 
         return [

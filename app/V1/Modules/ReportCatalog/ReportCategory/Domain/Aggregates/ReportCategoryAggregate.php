@@ -11,6 +11,7 @@ use Throwable;
 readonly class ReportCategoryAggregate
 {
     /**
+     * @phpstan-assert !null $category
      * @throws ReportCategoryNotFoundException|Throwable
      */
     public function ensureReportCategoryExists(

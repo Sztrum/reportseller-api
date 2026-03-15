@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\V1\Modules\ListingCatalog\Listing\Domain\Enums\ListingSellerTypeEnum;
 use App\V1\Modules\ListingCatalog\Listing\Domain\Models\Listing;
 use App\V1\Modules\ListingCatalog\ListingHistory\Domain\Models\ListingHistory;
+use Database\Factories\ListingHistoryFactory;
 use Illuminate\Database\Seeder;
 use Random\RandomException;
 use RuntimeException;
@@ -27,9 +28,11 @@ final class ListingHistorySeeder extends Seeder
         $listings->each(function (Listing $listing): void {
             $historyCount = random_int(1, 3);
             $capturedAt = now()->subDays(random_int(5, 45));
+            /** @var ListingHistoryFactory $listingHistoryFactory */
+            $listingHistoryFactory = ListingHistory::factory();
 
             for ($index = 0; $index < $historyCount; $index++) {
-                ListingHistory::factory()->create([
+                $listingHistoryFactory->create([
                     'listing_id' => $listing->id,
                     'external_id' => $listing->external_id,
                     'url' => $listing->url,
@@ -39,7 +42,7 @@ final class ListingHistorySeeder extends Seeder
                         ? random_int(500, 20_000)
                         : max(1, $listing->price + random_int(-300, 300)),
                     'currency' => $listing->currency ?? 'PLN',
-                    'seller_type' => $listing->seller_type?->value ?? fake()->randomElement(ListingSellerTypeEnum::values()),
+                    'seller_type' => $listing->seller_type !== null ? $listing->seller_type->value : fake()->randomElement(ListingSellerTypeEnum::values()),
                     'seller_name' => $listing->seller_name ?? fake()->name(),
                     'location' => $listing->location ?? fake()->city(),
                     'thumbnail_url' => $listing->thumbnail_url ?? fake()->imageUrl(),

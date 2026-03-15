@@ -27,6 +27,7 @@ return new class extends AbstractCreateTableMigration
 
             $table->string('title')->nullable();
             $table->text('description');
+            $table->string('receipt_token_hash', 64)->unique();
             $table->text('moderation_note')->nullable();
             $table->boolean('is_published')->default(false);
 

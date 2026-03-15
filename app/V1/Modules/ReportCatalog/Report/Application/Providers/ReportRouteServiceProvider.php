@@ -18,5 +18,6 @@ class ReportRouteServiceProvider extends ApiRouteServiceProvider
 //            $router->post('/delete', [ReportController::class, 'delete'])->name('delete');
         });
         $router->post('/store', [ReportController::class, 'store'])->name('store');
+        $router->get('/receipt/{receipt_token}', [ReportController::class, 'getReceipt'])->name('receipt.show');
     }
 }

@@ -41,6 +41,9 @@ class ReportAttachment extends Model
         'updated_at',
     ];
 
+    /**
+     * @return BelongsTo<Report, $this>
+     */
     public function report(): BelongsTo
     {
         return $this->belongsTo(Report::class, 'report_id');

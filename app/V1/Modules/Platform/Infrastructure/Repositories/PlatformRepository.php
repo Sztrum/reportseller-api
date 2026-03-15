@@ -6,6 +6,7 @@ namespace App\V1\Modules\Platform\Infrastructure\Repositories;
 
 use App\V1\Core\Infrastructure\Repositories\Eloquent\EloquentModelRepository;
 use App\V1\Modules\Platform\Domain\Models\Platform;
+use Illuminate\Support\Collection;
 
 class PlatformRepository extends EloquentModelRepository
 {
@@ -28,5 +29,20 @@ class PlatformRepository extends EloquentModelRepository
             ->first();
 
         return $platform;
+    }
+
+    /**
+     * @return Collection<int, Platform>
+     */
+    public function getActivePlatformsOrderedByOrder(): Collection
+    {
+        /** @var Collection<int, Platform> $platforms */
+        $platforms = $this->query()
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get();
+
+        return $platforms;
     }
 }
