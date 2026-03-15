@@ -35,3 +35,6 @@ Track cumulative recommended human development effort for the whole project usin
 7. 2026-03-15: platform dictionary API added a public index endpoint with active-only ordered results for frontend consumers and feature coverage tests.
    - Estimated effort delta added: 1 h 30 min - 3 h
    - Running total: 162 h - 270 h
+8. 2026-03-15: report status dictionary API added a public index endpoint with active-only frontend payload, descriptions, and feature coverage tests.
+   - Estimated effort delta added: 1 h 30 min - 3 h
+   - Running total: 163 h 30 min - 273 h

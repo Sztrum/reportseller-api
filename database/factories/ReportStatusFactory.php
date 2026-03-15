@@ -23,6 +23,7 @@ class ReportStatusFactory extends Factory
         return [
             'slug' => $slug,
             'name' => Str::title(str_replace('-', ' ', $slug)),
+            'description' => $this->faker->sentence(),
             'is_active' => $this->faker->boolean(80),
         ];
     }

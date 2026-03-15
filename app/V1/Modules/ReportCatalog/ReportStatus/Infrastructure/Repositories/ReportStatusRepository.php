@@ -6,6 +6,7 @@ namespace App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories;
 
 use App\V1\Core\Infrastructure\Repositories\Eloquent\EloquentModelRepository;
 use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
+use Illuminate\Support\Collection;
 
 class ReportStatusRepository extends EloquentModelRepository
 {
@@ -28,5 +29,19 @@ class ReportStatusRepository extends EloquentModelRepository
             ->first();
 
         return $reportStatus;
+    }
+
+    /**
+     * @return Collection<int, ReportStatus>
+     */
+    public function getActiveReportStatusesOrderedByName(): Collection
+    {
+        /** @var Collection<int, ReportStatus> $reportStatuses */
+        $reportStatuses = $this->query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return $reportStatuses;
     }
 }
