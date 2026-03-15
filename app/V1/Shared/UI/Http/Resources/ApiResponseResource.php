@@ -54,9 +54,14 @@ abstract class ApiResponseResource extends JsonResource
     private function getAllResourceData(): array
     {
         $id = data_get($this->resource, 'id');
-        $idData = (is_int($id) || is_string($id)) ? ['id' => $id] : [];
+        $idData = $this->shouldIncludeId() && (is_int($id) || is_string($id)) ? ['id' => $id] : [];
 
         return $idData + $this->getResourceData() + $this->getRelationships();
+    }
+
+    protected function shouldIncludeId(): bool
+    {
+        return true;
     }
 
     /**
