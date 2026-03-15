@@ -6,6 +6,7 @@ namespace App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositorie
 
 use App\V1\Core\Infrastructure\Repositories\Eloquent\EloquentModelRepository;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models\ReportCategory;
+use Illuminate\Support\Collection;
 
 class ReportCategoryRepository extends EloquentModelRepository
 {
@@ -28,5 +29,20 @@ class ReportCategoryRepository extends EloquentModelRepository
             ->first();
 
         return $reportCategory;
+    }
+
+    /**
+     * @return Collection<int, ReportCategory>
+     */
+    public function getActiveReportCategoriesOrderedByOrder(): Collection
+    {
+        /** @var Collection<int, ReportCategory> $reportCategories */
+        $reportCategories = $this->query()
+            ->where('is_active', true)
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get();
+
+        return $reportCategories;
     }
 }
