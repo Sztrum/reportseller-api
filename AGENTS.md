@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Version
-v1.17.0
+v1.18.0
 
 ## Scope
 This document applies to the entire repository.
@@ -32,6 +32,7 @@ Read documents in this exact order before implementation:
   - `app/V1/Modules/User/**` - user account lifecycle and profile-related domain logic.
   - `app/V1/Modules/Country/**` - country dictionaries/entities and mapping utilities.
   - `app/V1/Modules/Platform/**` - listing source platforms (for example slug/base URL metadata).
+  - `app/V1/Modules/ScrapingSystem/**` - shared external scraping/fetching/parsing flow used by domain modules to import listing data from third-party URLs.
   - `app/V1/Modules/ListingCatalog/**` - listing domain split into:
     - `Listing` - current listing state.
     - `ListingHistory` - historical snapshots for listing changes.

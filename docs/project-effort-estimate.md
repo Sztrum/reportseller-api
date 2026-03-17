@@ -41,3 +41,6 @@ Track cumulative recommended human development effort for the whole project usin
 9. 2026-03-15: report submission and receipt flows were aligned with active public dictionaries and receipt status presentation for frontend consumers.
    - Estimated effort delta added: 1 h 30 min - 3 h
    - Running total: 165 h - 276 h
+10. 2026-03-15: listing URL autofill spike introduced a public fetch-by-url endpoint, scraper registry flow, generic metadata extraction, and initial OLX-oriented support for frontend prefill experiments.
+   - Estimated effort delta added: 3 h - 6 h
+   - Running total: 168 h - 282 h
