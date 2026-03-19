@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Version
-v1.18.0
+v1.19.0
 
 ## Scope
 This document applies to the entire repository.
@@ -58,6 +58,7 @@ Read documents in this exact order before implementation:
 - For frontend asset changes (Vite/Tailwind/JS/SCSS), run `npm install` (if deps changed) and `npm run build` at repository root.
 - Maintain cumulative project effort estimation in `docs/project-effort-estimate.md` using only module scope (`app/V1/Modules/**`); explicitly exclude `app/V1/Core/**`, `app/V1/Shared/**`, and shared frontend/assets areas from time calculations.
 - At each commit action, include the current cumulative recommended project effort time from `docs/project-effort-estimate.md` in the commit communication/status update.
+- In scraping tasks, prefer scraper-local fixes in the specific platform scraper first; modify shared/base scraping infrastructure only when the issue is genuinely cross-platform or when the user explicitly requests a shared/global scraping change.
 
 ## Documentation workflow (mandatory)
 1. Before coding, read root `AGENTS.md` and all relevant local/module `AGENTS.md` files in touched scope (if present).

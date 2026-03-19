@@ -12,14 +12,17 @@ use App\V1\Modules\ListingCatalog\ListingChangeProposal\Application\Services\Lis
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Domain\Models\ListingChangeProposal;
 use App\V1\Modules\ListingCatalog\ListingChangeProposal\Infrastructure\Repositories\ListingChangeProposalRepository;
 use App\V1\Modules\Platform\Domain\Aggregates\PlatformAggregate;
+use App\V1\Modules\Platform\Domain\Models\Platform;
 use App\V1\Modules\Platform\Infrastructure\Repositories\PlatformRepository;
 use App\V1\Modules\ReportCatalog\Report\Application\Commands\ReportStoreCommand;
 use App\V1\Modules\ReportCatalog\Report\Domain\Models\Report;
 use App\V1\Modules\ReportCatalog\Report\Infrastructure\Repositories\ReportRepository;
 use App\V1\Modules\ReportCatalog\ReportAuthor\Infrastructure\Repositories\ReportAuthorRepository;
 use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Aggregates\ReportCategoryAggregate;
+use App\V1\Modules\ReportCatalog\ReportCategory\Domain\Models\ReportCategory;
 use App\V1\Modules\ReportCatalog\ReportCategory\Infrastructure\Repositories\ReportCategoryRepository;
 use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Aggregates\ReportStatusAggregate;
+use App\V1\Modules\ReportCatalog\ReportStatus\Domain\Models\ReportStatus;
 use App\V1\Modules\ReportCatalog\ReportStatus\Infrastructure\Repositories\ReportStatusRepository;
 use Illuminate\Support\Str;
 use Throwable;
@@ -56,9 +59,11 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
 
         $platform = $this->platformRepository->firstActiveBySlug($command->listingDTO->platform_slug);
         $this->platformAggregate->ensurePlatformExists($platform);
+        /** @var Platform $platform */
 
         $category = $this->reportCategoryRepository->firstActiveBySlug($command->listingDTO->report_category_slug);
         $this->reportCategoryAggregate->ensureReportCategoryExists($category);
+        /** @var ReportCategory $category */
 
         /** @var Listing|null $listing */
         $listing = null;
@@ -113,6 +118,7 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
 
         $reportStatus = $this->reportStatusRepository->firstBySlug(self::DEFAULT_REPORT_STATUS_SLUG);
         $this->reportStatusAggregate->ensureReportStatusExists($reportStatus, self::DEFAULT_REPORT_STATUS_SLUG);
+        /** @var ReportStatus $reportStatus */
 
         $receiptToken = Str::random(64);
 
@@ -174,4 +180,5 @@ readonly class ReportStoreCommandHandler implements CommandHandlerInterface
             'review_reason' => null,
         ]);
     }
+
 }

@@ -44,3 +44,6 @@ Track cumulative recommended human development effort for the whole project usin
 10. 2026-03-15: listing URL autofill spike introduced a public fetch-by-url endpoint, scraper registry flow, generic metadata extraction, and initial OLX-oriented support for frontend prefill experiments.
    - Estimated effort delta added: 3 h - 6 h
    - Running total: 168 h - 282 h
+11. 2026-03-19: listing autofill support was expanded with shared scraper infrastructure, multi-platform scraper coverage, report/listing payload alignment, and feature tests for seeded marketplace URLs.
+   - Estimated effort delta added: 6 h - 10 h
+   - Running total: 174 h - 292 h

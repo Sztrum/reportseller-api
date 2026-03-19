@@ -112,3 +112,8 @@ Note: `cat > file` uses shell redirection and may still be evaluated as `bash -l
 
 ### Configure to not restart after docker restart
 `sed -i 's/restart: always/restart: "no"/g' laradock/docker-compose.yml && cd laradock && sh start.sh && sh stop.sh && cd ../`
+
+## TODO
+
+- Prepare scraping of external listing URLs through a proxy layer to improve reliability and reduce blocking risk for providers such as OLX.
+- Review all supported listing scrapers and align extracted category, seller type, and availability fields across every platform-specific implementation.
